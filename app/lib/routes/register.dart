@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:iot/utilities/formatters.dart';
-import 'package:iot/widgets/password_field.dart';
+import 'package:app/utilities/formatters.dart';
+import 'package:app/widgets/password_field.dart';
 
 
 class RegisterRoute extends StatelessWidget {

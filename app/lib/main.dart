@@ -2,7 +2,7 @@
 // Sets style settings and invokes the launch of the app.
 
 import 'package:flutter/material.dart';
-import 'package:iot/routes/register.dart';
+import 'package:app/routes/register.dart';
 
 
 void main() {
@@ -23,6 +23,7 @@ class App extends StatelessWidget {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
+        primarySwatch: Colors.purple,
       ),
       themeMode: ThemeMode.system,
       home: const RegisterRoute(),
