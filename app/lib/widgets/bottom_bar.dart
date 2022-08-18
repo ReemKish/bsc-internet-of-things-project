@@ -50,9 +50,9 @@ class _BottomSheetContent extends StatelessWidget {
     return Column(
         children: [
           UserAccountsDrawerHeader(
-            accountName: const Text("Reem Kishinevsky"),
+            accountName: const Text("Re'em Kishinevsky"),
             accountEmail: const Text("reem.kishinevsky@gmail.com"),
-            currentAccountPicture: name2avatar("Reem Kishinevsky"),
+            currentAccountPicture: name2avatar("Re'em Kishinevsky"),
             decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
           ),

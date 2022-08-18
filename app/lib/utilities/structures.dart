@@ -9,7 +9,7 @@ class Profile {
 }
 
 class Device {
-  int id;
+  String id;
   Profile holder;
   bool notify;
   Device(this.id, this.holder, {this.notify = true});

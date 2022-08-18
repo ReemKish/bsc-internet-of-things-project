@@ -1,11 +1,13 @@
 // ===== home.dart ==============================
 // Home page of the app. Shows list of linked devices.
 
+import 'package:app/utilities/azure.dart';
 import 'package:flutter/material.dart';
 import 'package:app/utilities/alerts.dart';
 import 'package:app/widgets/bottom_bar.dart';
 import 'package:app/utilities/structures.dart';
 import 'package:app/utilities/avatar.dart';
+import 'package:app/routes/scan_qr.dart';
 
 
 class HomeRoute extends StatefulWidget {
@@ -17,19 +19,14 @@ class HomeRoute extends StatefulWidget {
 
 
 class HomeRouteState extends State<HomeRoute> {
-  final _tracked = <Device>[
-    Device(1, Profile("David Molina", "davidm@gmail.com", "054-123-4567"), notify: false),
-    Device(2, Profile("Yuval Cohen", "yuvalc@walla.co.il", "054-631-1200")),
-  ];
+  final _tracked = <Device>[];
 
 
   Widget _buildDeviceList() {
-    return  ListView(
-      children: _tracked.map(
-        (device) {
-          return DeviceItem(this, device);
-        },
-      ).toList(),
+    List<Widget> list = _tracked.map((device) => DeviceItem(this, device)).toList();
+    return ListView(
+      padding: const EdgeInsets.only(top: 4.0, bottom: 32),
+      children: list
     );
   }
 
@@ -46,11 +43,24 @@ class HomeRouteState extends State<HomeRoute> {
       ),
     );
 
+
+
     return Scaffold(
       appBar: AppBar(toolbarHeight: 40),
       body: _tracked.isEmpty ? noDevicesMsg : _buildDeviceList(),
       floatingActionButton: FloatingActionButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                      buildqr(context, (id) {
+                        setState(() {
+                          _tracked.add(id2device(id));
+                        });
+                    })
+                  )
+                );
+              },
               tooltip: "Scan device QR",
               child: const Icon(Icons.add),
       ),
