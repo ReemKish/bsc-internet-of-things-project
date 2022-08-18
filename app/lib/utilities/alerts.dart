@@ -36,7 +36,7 @@ void showInSnackBar(
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(msg),
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 1000),
     )
   );
 }

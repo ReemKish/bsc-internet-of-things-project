@@ -122,6 +122,7 @@ class _DeviceItemState extends State<DeviceItem> {
                     }
                   );
                 },
+                tooltip: "Remove",
                 icon: const Icon(
                   Icons.delete_forever_outlined,
                   color: Colors.red
@@ -130,12 +131,13 @@ class _DeviceItemState extends State<DeviceItem> {
               IconButton(  // Notify
                 onPressed: () {
                   device.notify ?
-                    showInSnackBar(context, "off") :
-                    showInSnackBar(context, "on");
+                    showInSnackBar(context, "Disabled notifictations from ${holder.name}.") :
+                    showInSnackBar(context, "Enabled notifictations from ${holder.name}.");
                   setState(() {
                     device.notify = !device.notify;
                   });
                 },
+                tooltip: "Notify",
                 icon: Icon(
                   device.notify ? Icons.notifications_on : Icons.notifications_off,
                   color: device.notify ?
