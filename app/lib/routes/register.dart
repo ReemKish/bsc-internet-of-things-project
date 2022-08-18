@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:app/utilities/formatters.dart';
+import 'package:app/utilities/alerts.dart';
 import 'package:app/widgets/password_field.dart';
 
 
@@ -45,22 +46,17 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
-  void showInSnackBar(String value) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(value),
-    ));
-  }
 
   void _handleSubmitted() {
     final form = _formKey.currentState!;
     if (!form.validate()) {
       showInSnackBar(
+        context,
         "Please fix the errors in red before submitting."
       );
     } else {
       form.save();
-      showInSnackBar("Registration successful!");
+      showInSnackBar(context, "Registration successful!");
     }
   }
 

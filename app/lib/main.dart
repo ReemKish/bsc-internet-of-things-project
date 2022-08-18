@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:app/routes/register.dart';
+import 'package:app/routes/home.dart';
 
 
 void main() {
@@ -17,16 +18,39 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'IoT',
+      // ===== Light Theme ======================
       theme: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.purple,
+        primarySwatch: Colors.orange,
+        /* bottomAppBarColor: Colors.deepPurple, */
+        cardColor: Colors.grey.shade100,
+        expansionTileTheme: const ExpansionTileThemeData(
+          textColor: Colors.black,
+          iconColor: Colors.orange,
+        ),
+        bottomSheetTheme: BottomSheetThemeData(
+          modalBackgroundColor: Colors.orange.shade300,
+        ),
       ),
+
+      // ===== Dark Theme =======================
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.purple,
+        primarySwatch: Colors.orange,
+        colorScheme: ColorScheme.fromSwatch(
+          brightness: Brightness.dark,
+          primarySwatch: Colors.orange,
+        ).copyWith(
+          secondary: Colors.orange
+        ),
+        expansionTileTheme: const ExpansionTileThemeData(
+          textColor: Colors.white,
+          iconColor: Colors.orange,
+        ),
       ),
+
       themeMode: ThemeMode.system,
-      home: const RegisterRoute(),
+      home: const HomeRoute(),
     );
   }
 }
