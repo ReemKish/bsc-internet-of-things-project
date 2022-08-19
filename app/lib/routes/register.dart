@@ -180,39 +180,37 @@ class _RegisterFormState extends State<RegisterForm> {
 
     return Form(
       key: _formKey,
-      child: Scrollbar(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            children: [
-              sizedBoxSpace,
-              fName,            // Name field
-              sizedBoxSpace,
-              fPhone,           // Phone number field
-              sizedBoxSpace,
-              fEmail,           // Email address field
-              sizedBoxSpace,
-              fPassword,        // Password field
-              sizedBoxSpace,
-              fRetypePassword,  // Re-type password field
-              sizedBoxSpace,
-              Center(
-                child: ElevatedButton(
-                  onPressed: _handleSubmitted,
-                  child: const Text("Submit"),
-                ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          children: [
+            sizedBoxSpace,
+            fName,            // Name field
+            sizedBoxSpace,
+            fPhone,           // Phone number field
+            sizedBoxSpace,
+            fEmail,           // Email address field
+            sizedBoxSpace,
+            fPassword,        // Password field
+            sizedBoxSpace,
+            fRetypePassword,  // Re-type password field
+            sizedBoxSpace,
+            Center(
+              child: ElevatedButton(
+                onPressed: _handleSubmitted,
+                child: const Text("Submit"),
               ),
-              halfSizedBoxSpace,
-              Text(
-                /* localizations.demoTextFieldRequiredField, */
-                "* indicates required field",
-                style: Theme.of(context).textTheme.caption,
-              ),
-              sizedBoxSpace,
-            ],
-          ),
+            ),
+            halfSizedBoxSpace,
+            Text(
+              /* localizations.demoTextFieldRequiredField, */
+              "* indicates required field",
+              style: Theme.of(context).textTheme.caption,
+            ),
+            sizedBoxSpace,
+          ],
         ),
-      ),   
+      ),
     );
   }
 }
