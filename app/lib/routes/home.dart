@@ -8,6 +8,7 @@ import 'package:app/widgets/bottom_bar.dart';
 import 'package:app/utilities/structures.dart';
 import 'package:app/utilities/avatar.dart';
 import 'package:app/routes/scan_qr.dart';
+import 'package:app/widgets/dialog_item.dart';
 
 
 class HomeRoute extends StatefulWidget {
@@ -19,7 +20,10 @@ class HomeRoute extends StatefulWidget {
 
 
 class HomeRouteState extends State<HomeRoute> {
-  final _tracked = <Device>[];
+  final _tracked = <Device>[
+    Device("2", Profile("Re'em Kishinevsky", "reem.kishinevsky@gmail.com", "054-642-1200")),
+    Device('1', Profile("David Molina", "davidm@gmail.com", "054-123-4567"))
+  ];
 
 
   Widget _buildDeviceList() {
@@ -27,6 +31,60 @@ class HomeRouteState extends State<HomeRoute> {
     return ListView(
       padding: const EdgeInsets.only(top: 4.0, bottom: 32),
       children: list
+    );
+  }
+
+  void _scanDeviceQR() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) =>
+          buildqr(context, (id) {
+            setState(() {
+              _tracked.add(id2device(id));
+            });
+        })
+      )
+    );
+  }
+
+  void _enterDeviceID() {
+    Navigator.of(context).push(
+      DialogRoute<String>(
+        context: context,
+        builder: (context) => SimpleDialog(
+          title: const Text("Add Device"),
+          children: [
+            DialogItem(
+              icon: Icons.vpn_key,
+              text: 'Enter device ID',
+              action: _enterDeviceID,
+            ),
+          ],
+        )
+      )
+    );
+  }
+
+  void _addDevice() {
+    Navigator.of(context).push(
+      DialogRoute<String>(
+        context: context,
+        builder: (context) => SimpleDialog(
+          title: const Text("Add Device"),
+          children: [
+            DialogItem(
+              icon: Icons.qr_code_scanner,
+              text: 'Scan device QR',
+              action: _scanDeviceQR,
+            ),
+            DialogItem(
+              icon: Icons.vpn_key,
+              text: 'Enter device ID',
+              action: _enterDeviceID,
+            ),
+          ],
+        )
+      )
     );
   }
 
@@ -49,20 +107,9 @@ class HomeRouteState extends State<HomeRoute> {
       appBar: AppBar(toolbarHeight: 40),
       body: _tracked.isEmpty ? noDevicesMsg : _buildDeviceList(),
       floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                      buildqr(context, (id) {
-                        setState(() {
-                          _tracked.add(id2device(id));
-                        });
-                    })
-                  )
-                );
-              },
-              tooltip: "Scan device QR",
-              child: const Icon(Icons.add),
+        onPressed: _addDevice,
+        tooltip: "Scan device QR",
+        child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: const BottomBar(),
