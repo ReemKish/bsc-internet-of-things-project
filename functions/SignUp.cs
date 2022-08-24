@@ -14,21 +14,36 @@ namespace Arc.Function
     {
         [FunctionName("SignUp")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [CosmosDB(
+        databaseName: "arc_db_id",
+        collectionName: "users",
+        ConnectionStringSetting = "CosmosDbConnectionString")]IAsyncCollector<dynamic> documentsOut, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
-
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            string name = data?.name;
+            string phoneNumber = data?.phoneNumber;
+            string email = data?.email;
+            string password = data?.password;
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+            string responseMessage = data.ToString();
 
+            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(phoneNumber) && !string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
+            {
+                // Add a JSON document to the output container.
+                await documentsOut.AddAsync(new
+                {
+                    // create a random ID
+                    id = System.Guid.NewGuid().ToString(),
+                    name = name,
+                    phoneNumber = phoneNumber,
+                    email = email,
+                    password = password
+                });
+            }           
             return new OkObjectResult(responseMessage);
         }
     }
