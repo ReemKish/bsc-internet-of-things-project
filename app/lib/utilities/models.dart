@@ -1,5 +1,5 @@
-// ===== structures.dart ==============================
-// Data structures used throughout the app.
+// ===== models.dart ==============================
+// Data models used throughout the app.
 
 class Profile {
   String name;

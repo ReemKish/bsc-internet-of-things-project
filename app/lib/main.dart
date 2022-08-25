@@ -4,11 +4,21 @@
 import 'package:flutter/material.dart';
 import 'package:app/routes/register.dart';
 import 'package:app/routes/home.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
 
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseMessaging.instance.getToken();
   runApp(const App());
 }
+
+
 
 
 class App extends StatelessWidget {
@@ -50,7 +60,7 @@ class App extends StatelessWidget {
       ),
 
       themeMode: ThemeMode.system,
-      home: const HomeRoute(),
+      home: const RegisterRoute(),
     );
   }
 }

@@ -37,6 +37,7 @@ class _PasswordFieldState extends State<PasswordField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: "Stonewow1",  // TODO - remove this
       key: widget.fieldKey,
       textInputAction: widget.textInputAction,
       obscureText: _obscureText,

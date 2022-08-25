@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "341280768998",
+    "project_id": "iot-arc-37d48",
+    "storage_bucket": "iot-arc-37d48.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341280768998:android:94b91f0fb334dbbce68c27",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341280768998-q0lgmreso4tem4jlll33e2ie8d26e8d2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCI5jumiVe-TnQueeBiZXvVWDVNY4wkE74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341280768998-q0lgmreso4tem4jlll33e2ie8d26e8d2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "341280768998-nikpe1q03ost2m7rhbpk9dhn548o0b6e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

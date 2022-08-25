@@ -1,14 +1,15 @@
 // ===== home.dart ==============================
 // Home page of the app. Shows list of linked devices.
 
-import 'package:app/utilities/azure.dart';
+import 'package:app/utilities/cloud.dart';
 import 'package:flutter/material.dart';
 import 'package:app/utilities/alerts.dart';
 import 'package:app/widgets/bottom_bar.dart';
-import 'package:app/utilities/structures.dart';
+import 'package:app/utilities/models.dart';
 import 'package:app/utilities/avatar.dart';
 import 'package:app/routes/scan_qr.dart';
 import 'package:app/widgets/dialog_item.dart';
+import 'package:provider/provider.dart';
 
 
 class HomeRoute extends StatefulWidget {
@@ -25,12 +26,13 @@ class HomeRouteState extends State<HomeRoute> {
     Device('1', Profile("David Molina", "davidm@gmail.com", "054-123-4567"))
   ];
 
+  var _viewed = <DeviceItem>[];
 
   Widget _buildDeviceList() {
-    List<Widget> list = _tracked.map((device) => DeviceItem(this, device)).toList();
+    _viewed = _tracked.map((device) => DeviceItem(this, device, key: Key(device.id))).toList();
     return ListView(
       padding: const EdgeInsets.only(top: 4.0, bottom: 32),
-      children: list
+      children: _viewed,
     );
   }
 
@@ -88,8 +90,18 @@ class HomeRouteState extends State<HomeRoute> {
     );
   }
 
+  void _setEmergency(String deviceId, bool emergency) {
+    for (var i = 0; i < _viewed.length; i++) {
+      if (_viewed[i].key == Key(deviceId)) {
+        _viewed[i].setEmergency(emergency);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    fallAction((String deviceId) {_setEmergency(deviceId, true);});
+    
     Widget noDevicesMsg = const Center(
       child: Text(
         "You have no tracked devices.",
@@ -100,8 +112,6 @@ class HomeRouteState extends State<HomeRoute> {
         ),
       ),
     );
-
-
 
     return Scaffold(
       appBar: AppBar(toolbarHeight: 40),
@@ -121,18 +131,32 @@ class HomeRouteState extends State<HomeRoute> {
 class DeviceItem extends StatefulWidget {
   final Device? device;
   final HomeRouteState deviceList;
-  const DeviceItem(this.deviceList, this.device, {Key? key, isExpand = false}) : super(key: key);
+  late Function setEmergency;
+  DeviceItem(this.deviceList, this.device, {Key? key, isExpand = false}) : super(key: key);
 
   @override
-  State<DeviceItem> createState() => _DeviceItemState();
+  State<DeviceItem> createState() {
+    final state = _DeviceItemState();
+    setEmergency = state.setEmergency;
+    return state;
+  }
 }
 
 class _DeviceItemState extends State<DeviceItem> {
+  bool emergency = false;
+
+  void setEmergency(bool emergency) {
+    setState(() {
+      this.emergency = emergency;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final device = widget.device;
     final holder = device!.holder;
     return Card(
+      color: emergency ? Colors.red : Theme.of(context).cardColor,
       child: ExpansionTile(
         childrenPadding: const EdgeInsets.only(top: 0),
         title: Text(
@@ -204,7 +228,7 @@ class _DeviceItemState extends State<DeviceItem> {
                                 Colors.black.withRed(195).withGreen(195)
                             ) : 
                             Theme.of(context).iconTheme.color,
-                ),
+              ),
               ),
             ]
           )

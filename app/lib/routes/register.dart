@@ -6,6 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:app/utilities/formatters.dart';
 import 'package:app/utilities/alerts.dart';
 import 'package:app/widgets/password_field.dart';
+import 'package:app/api/notification_hub.dart';
+import 'package:app/utilities/cloud.dart';
+import 'package:app/utilities/models.dart';
 
 
 class RegisterRoute extends StatelessWidget {
@@ -31,8 +34,10 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
+  /* final notificationRegistrationService = NotificationRegistrationService(Config.backendServiceEndpoint, Config.apiKey); */
 
   late FocusNode _retypePassword;
+  Profile profile = Profile("", "", "");
 
   @override
   void initState() {
@@ -46,6 +51,10 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
+  void _register() async {
+    subscribeToNotifications(profile.email);
+  }
+
 
   void _handleSubmitted() {
     final form = _formKey.currentState!;
@@ -56,6 +65,7 @@ class _RegisterFormState extends State<RegisterForm> {
       );
     } else {
       form.save();
+      _register();
       showInSnackBar(context, "Registration successful!");
     }
   }
@@ -102,6 +112,7 @@ class _RegisterFormState extends State<RegisterForm> {
     const halfSizedBoxSpace = SizedBox(height: 12);
 
     final fName = TextFormField(
+      initialValue: "Reem Kishinevsky",  // TODO - remove this
       textInputAction: TextInputAction.next,
       textCapitalization: TextCapitalization.words,
       decoration: const InputDecoration(
@@ -110,12 +121,13 @@ class _RegisterFormState extends State<RegisterForm> {
         labelText: "Name*",
       ),
       onSaved: (value) {
-        /* TODO  */
+        profile.name = value!;
       },
       validator:  _validateName,
     );
 
     final fPhone = TextFormField(
+      initialValue: "054 642 1200",  // TODO - remove this
       textInputAction: TextInputAction.next,
       decoration: const InputDecoration(
         filled: true,
@@ -125,7 +137,7 @@ class _RegisterFormState extends State<RegisterForm> {
       ),
       keyboardType: TextInputType.phone,
       onSaved: (value) {
-        /* TODO  */
+        profile.phoneNumber = value!;
       },
       maxLength: 12,
       maxLengthEnforcement: MaxLengthEnforcement.none,
@@ -139,6 +151,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
 
     final fEmail = TextFormField(
+      initialValue: "reem.kishinevsky@gmail.com",  // TODO - remove this
       textInputAction: TextInputAction.next,
       decoration: const InputDecoration(
         filled: true,
@@ -147,7 +160,7 @@ class _RegisterFormState extends State<RegisterForm> {
       ),
       keyboardType: TextInputType.emailAddress,
       onSaved: (value) {
-        /* TODO */
+        profile.email = value!;
       },
     );
 
@@ -165,6 +178,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
 
     final fRetypePassword = TextFormField(
+      initialValue: "Stonewow1",  // TODO - remove this
       focusNode: _retypePassword,
       decoration: const InputDecoration(
         filled: true,
