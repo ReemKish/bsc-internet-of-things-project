@@ -10,6 +10,7 @@ using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using Microsoft.Azure.Documents.Linq;
 
 namespace Arc.Function
 {
@@ -35,17 +36,41 @@ namespace Arc.Function
                     log.LogInformation($"C# Event Hub trigger function processed a message: {eventBody}");
                     dynamic data = JsonConvert.DeserializeObject(eventBody);
                     string deviceId = data.deviceId;
-                    
+                    string ownerName = "Someone";
+
+                    Uri collectionUri = UriFactory.CreateDocumentCollectionUri("arc_db_id", "users");
+
+                    log.LogInformation($"Searching for deviceId: {deviceId}");
+
+                    var options = new FeedOptions { EnableCrossPartitionQuery = true }; // Enable cross partition query
+
+                    IDocumentQuery<BasicUser> query = client.CreateDocumentQuery<BasicUser>(collectionUri, options)
+                        .Where(p => p.DeviceId.Contains(deviceId))
+                        .AsDocumentQuery();
+
+                    while (query.HasMoreResults)
+                    {
+                        foreach (BasicUser db_user in await query.ExecuteNextAsync())
+                        {
+                            ownerName = db_user.Name;
+                        }
+                    }
+
                     string HUB_NAME = "arc-notification-hub";
                     string NH_NAMESPACE = "arc-notification-hub-namespace";
                     string resourceUri = $"https://{NH_NAMESPACE}.servicebus.windows.net/{HUB_NAME}/messages/";
                     using (var request = CreateHttpRequest(HttpMethod.Post, resourceUri, deviceId))
                     {
+                        JObject jnotification = new JObject();
+                        jnotification.Add("title", "ARC ALERT!"); 
+                        jnotification.Add("body", $"{ownerName}'s ARC device has detected a fall!"); 
+
+                        JObject jdata = new JObject();                        
+                        jdata.Add("deviceId", deviceId); 
+
                         JObject jobject = new JObject();
-                        JObject jdata = new JObject();
-                        jdata.Add("deviceId", deviceId);
+                        jobject.Add("notification", jnotification); 
                         jobject.Add("data", jdata); 
-                        
                         var content = jobject.ToString();
 
                         request.Content = new StringContent(content, Encoding.UTF8, "application/json");

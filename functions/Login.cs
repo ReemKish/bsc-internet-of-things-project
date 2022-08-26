@@ -15,6 +15,22 @@ namespace Arc.Function
 {
     public static class Login
     {
+
+        public static async getBasicUsersByIds(DocumentClient client, Uri collectionUri, FeedOptions options, ){
+            
+            IDocumentQuery<FullUser> query = client.CreateDocumentQuery<FullUser>(collectionUri, options)
+            .Where(p => p.Email.Equals(email))
+            .AsDocumentQuery();
+
+            while (query.HasMoreResults)
+            {
+                foreach (FullUser db_user in await query.ExecuteNextAsync())
+                {
+                    
+                }
+            }
+        }
+
         [FunctionName("Login")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
@@ -41,17 +57,28 @@ namespace Arc.Function
 
             var options = new FeedOptions { EnableCrossPartitionQuery = true }; // Enable cross partition query
  
-            IDocumentQuery<User> query = client.CreateDocumentQuery<User>(collectionUri, options)
-                .Where(p => p.Email.Contains(email))
+            IDocumentQuery<FullUser> query = client.CreateDocumentQuery<FullUser>(collectionUri, options)
+                .Where(p => p.Email.Equals(email))
                 .AsDocumentQuery();
 
             while (query.HasMoreResults)
             {
-                foreach (User db_user in await query.ExecuteNextAsync())
+                foreach (FullUser db_user in await query.ExecuteNextAsync())
                 {
                     log.LogInformation(db_user.Email);
-                    if (db_user.Password == password) {
-                        UserResponse u = new UserResponse(db_user);
+                    if (db_user.Password.Equals(password)) {
+                        //Login granted, get data for display.
+                        PopulatedFollowUser populatedFollowUser = new PopulatedFollowUser(db_user);
+                        if (db_user.Following){
+                            List<BasicUser> followingList = getBasicUsersByIds(client,collectionUri,options,db_user.Following);
+                            populatedFollowUser.Following = followingList;
+                        }
+                        if (db_user.FollowedBy){
+                        List<BasicUser> followedByList = getBasicUsersByIds(db_user.FollowedBy);
+                        populatedFollowUser.FollowedBy = followedByList;
+                        }
+
+                        FollowExtendedUser u = (FollowExtendedUser)db_user;
                         return new OkObjectResult(JsonConvert.SerializeObject(u));
                     }
                 }
