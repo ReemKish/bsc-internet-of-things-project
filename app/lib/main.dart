@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:app/routes/register.dart';
 import 'package:app/routes/home.dart';
 import 'package:app/models/profile_device.dart';
+import 'package:app/notification_handler.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -16,6 +17,7 @@ void main() async {
   options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseMessaging.instance.getToken();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   runApp(const App());
 }
 
