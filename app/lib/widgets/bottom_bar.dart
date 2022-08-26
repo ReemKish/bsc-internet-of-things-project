@@ -4,10 +4,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:app/utilities/avatar.dart';
+import 'package:app/utilities/models.dart';
 
 
 class BottomBar extends StatelessWidget {
-  const BottomBar({super.key});
+  final Profile profile;
+  const BottomBar(this.profile, {super.key});
 
 
   void _showModalBottomSheet(BuildContext context) {
@@ -15,7 +17,7 @@ class BottomBar extends StatelessWidget {
       context: context,
       builder: (context) {
         return Wrap(
-          children: [ _BottomSheetContent() ] 
+          children: [ _BottomSheetContent(profile.name, profile.email) ] 
         );
       },
     );
@@ -45,14 +47,17 @@ class BottomBar extends StatelessWidget {
 
 
 class _BottomSheetContent extends StatelessWidget {
+  final String name;
+  final String email;
+  const _BottomSheetContent(this.name, this.email);
   @override
   Widget build(BuildContext context) {
     return Column(
         children: [
           UserAccountsDrawerHeader(
-            accountName: const Text("Re'em Kishinevsky"),
-            accountEmail: const Text("reem.kishinevsky@gmail.com"),
-            currentAccountPicture: name2avatar("Re'em Kishinevsky"),
+            accountName: Text(name),
+            accountEmail: Text(email),
+            currentAccountPicture: name2avatar(name),
             decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
           ),

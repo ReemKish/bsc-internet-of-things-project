@@ -9,6 +9,7 @@ import 'package:app/widgets/password_field.dart';
 import 'package:app/api/notification_hub.dart';
 import 'package:app/utilities/cloud.dart';
 import 'package:app/utilities/models.dart';
+import 'package:app/api/functions.dart';
 
 
 class RegisterRoute extends StatelessWidget {
@@ -37,7 +38,7 @@ class _RegisterFormState extends State<RegisterForm> {
   /* final notificationRegistrationService = NotificationRegistrationService(Config.backendServiceEndpoint, Config.apiKey); */
 
   late FocusNode _retypePassword;
-  Profile profile = Profile("", "", "");
+  Profile profile = Profile("", "", "","");
 
   @override
   void initState() {
@@ -53,6 +54,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
   void _register() async {
     subscribeToNotifications(profile.email);
+    CloudFunctions.signUp(profile.name, profile.phoneNumber, profile.email, profile.password);
   }
 
 
@@ -174,6 +176,9 @@ class _RegisterFormState extends State<RegisterForm> {
           /* person.password = value; */
           _retypePassword.requestFocus();
         });
+      },
+      onSaved: (value) {
+        profile.password = value!;
       },
     );
 

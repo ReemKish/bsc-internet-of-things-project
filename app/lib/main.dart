@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:app/routes/register.dart';
 import 'package:app/routes/home.dart';
+import 'package:app/utilities/models.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -60,7 +61,8 @@ class App extends StatelessWidget {
       ),
 
       themeMode: ThemeMode.system,
-      home: const RegisterRoute(),
+      /* home: const RegisterRoute(), */
+      home: HomeRoute(Profile("Reem Kishinevsky", "reem.kishinevsky@gmail.com", "054 642 1200", "stonewow1")),
     );
   }
 }

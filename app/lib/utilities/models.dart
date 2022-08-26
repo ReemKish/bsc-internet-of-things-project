@@ -5,7 +5,8 @@ class Profile {
   String name;
   String email;
   String phoneNumber;
-  Profile(this.name, this.email, this.phoneNumber);
+  String password;
+  Profile(this.name, this.email, this.phoneNumber, this.password);
 }
 
 class Device {

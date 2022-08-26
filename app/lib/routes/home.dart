@@ -9,11 +9,14 @@ import 'package:app/utilities/models.dart';
 import 'package:app/utilities/avatar.dart';
 import 'package:app/routes/scan_qr.dart';
 import 'package:app/widgets/dialog_item.dart';
-import 'package:provider/provider.dart';
+/* import 'package:provider/provider.dart'; */
 
 
 class HomeRoute extends StatefulWidget {
-  const HomeRoute({Key? key}) : super(key: key);
+  final Profile profile;
+  HomeRoute(this.profile, {Key? key}) : super(key: key) {
+    fallAction((String deviceId) {});
+}
 
   @override
   State createState() => HomeRouteState();
@@ -22,18 +25,32 @@ class HomeRoute extends StatefulWidget {
 
 class HomeRouteState extends State<HomeRoute> {
   final _tracked = <Device>[
-    Device("2", Profile("Re'em Kishinevsky", "reem.kishinevsky@gmail.com", "054-642-1200")),
-    Device('1', Profile("David Molina", "davidm@gmail.com", "054-123-4567"))
+    Device("ARC-001", Profile("Reem Kishinevsky", "reem.kishinevsky@gmail.com", "054-642-1200", "pas1")),
+    Device('ARC-002', Profile("David Molina", "davidm@gmail.com", "054-123-4567", "pas2"))
   ];
+
 
   var _viewed = <DeviceItem>[];
 
-  Widget _buildDeviceList() {
+  void constructViewed() {
     _viewed = _tracked.map((device) => DeviceItem(this, device, key: Key(device.id))).toList();
+  }
+
+  Widget _buildDeviceList() {
+    constructViewed();
     return ListView(
       padding: const EdgeInsets.only(top: 4.0, bottom: 32),
       children: _viewed,
     );
+  }
+
+  void _followDevice(String id) {
+    /* update device list */
+    setState(() {
+      _tracked.add(id2device(id));
+    });
+    /* subscribe to notifications */
+    followDevice(widget.profile.email, id);
   }
 
   void _scanDeviceQR() {
@@ -41,33 +58,14 @@ class HomeRouteState extends State<HomeRoute> {
       MaterialPageRoute(
         builder: (context) =>
           buildqr(context, (id) {
-            setState(() {
-              _tracked.add(id2device(id));
-            });
+            _followDevice(id);
         })
       )
     );
   }
 
-  void _enterDeviceID() {
-    Navigator.of(context).push(
-      DialogRoute<String>(
-        context: context,
-        builder: (context) => SimpleDialog(
-          title: const Text("Add Device"),
-          children: [
-            DialogItem(
-              icon: Icons.vpn_key,
-              text: 'Enter device ID',
-              action: _enterDeviceID,
-            ),
-          ],
-        )
-      )
-    );
-  }
-
   void _addDevice() {
+    /* return;  // TODO - remove this */
     Navigator.of(context).push(
       DialogRoute<String>(
         context: context,
@@ -79,10 +77,10 @@ class HomeRouteState extends State<HomeRoute> {
               text: 'Scan device QR',
               action: _scanDeviceQR,
             ),
-            DialogItem(
+            DialogFieldButton(
               icon: Icons.vpn_key,
               text: 'Enter device ID',
-              action: _enterDeviceID,
+              action: _followDevice,
             ),
           ],
         )
@@ -91,6 +89,7 @@ class HomeRouteState extends State<HomeRoute> {
   }
 
   void _setEmergency(String deviceId, bool emergency) {
+    print(deviceId);
     for (var i = 0; i < _viewed.length; i++) {
       if (_viewed[i].key == Key(deviceId)) {
         _viewed[i].setEmergency(emergency);
@@ -100,7 +99,6 @@ class HomeRouteState extends State<HomeRoute> {
 
   @override
   Widget build(BuildContext context) {
-    fallAction((String deviceId) {_setEmergency(deviceId, true);});
     
     Widget noDevicesMsg = const Center(
       child: Text(
@@ -122,7 +120,7 @@ class HomeRouteState extends State<HomeRoute> {
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      bottomNavigationBar: const BottomBar(),
+      bottomNavigationBar: BottomBar(widget.profile),
     );
   }
 }
@@ -197,8 +195,13 @@ class _DeviceItemState extends State<DeviceItem> {
                     context: context,
                     prompt: "Stop tracking ${holder.name}?",
                     action: () { 
-                      widget.deviceList.setState(() {
-                        widget.deviceList._tracked.remove(device);
+                      setState(() {
+                        widget.deviceList.setState(() {
+                          widget.deviceList._tracked.remove(device);
+                          print(widget.deviceList._tracked);
+                          widget.deviceList.constructViewed();
+                          print(widget.deviceList._viewed);
+                        });
                       });
                     }
                   );
