@@ -105,11 +105,12 @@ class FieldButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isTextFieldShown 
-          ? TextField(
+          ? TextFormField(
+              initialValue: "ARC-001",  // TODO remove this
               textCapitalization: TextCapitalization.characters,
               autofocus: true,
-              onSubmitted: (String value) {action(value);},
-          )
+              onFieldSubmitted: (String value) {action(value);},
+            )
           : Text(text);
   }
 }

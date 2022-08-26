@@ -1,9 +1,6 @@
 // ===== home.dart ========================================
 // Home page of the app. Shows list of linked devices.
 
-import 'dart:io';
-
-import 'package:app/utilities/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:app/utilities/alerts.dart';
 import 'package:app/widgets/bottom_bar.dart';
