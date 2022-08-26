@@ -8,17 +8,17 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Documents.Linq;
-
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace Arc.Function
 {
     public static class FallDetection
     {
+        static readonly HttpClient httpClient = new HttpClient();
+
         [FunctionName("FallDetection")]
-        public static async Task Run([EventHubTrigger("fall-detection-event-hub", Connection = "eventhubworkshop2022_iothubroutes_iothubworkshop082022_EVENTHUB")] EventData[] events, ILogger log
-        ,IAsyncCollector<IDictionary<string,string>> notification,
+        public static async Task Run([EventHubTrigger("fall-detection-event-hub", Connection = "eventhubworkshop2022_iothubroutes_iothubworkshop082022_EVENTHUB")] EventData[] events, ILogger log,
         [CosmosDB(
                 databaseName: "arc_db_id",
                 collectionName: "users",
@@ -36,29 +36,24 @@ namespace Arc.Function
                     dynamic data = JsonConvert.DeserializeObject(eventBody);
                     string deviceId = data.deviceId;
                     
-                    // Get users to call
-                    List<string> mailArray = new List<string>();
-                    Uri collectionUri = UriFactory.CreateDocumentCollectionUri("arc_db_id", "users");
-                    var options = new FeedOptions { EnableCrossPartitionQuery = true }; // Enable cross partition query
-                    IDocumentQuery<User> query = client.CreateDocumentQuery<User>(collectionUri, options)
-                        .Where(p => p.DeviceId.Contains(deviceId))
-                        .AsDocumentQuery();
-
-                    while (query.HasMoreResults)
+                    string HUB_NAME = "arc-notification-hub";
+                    string NH_NAMESPACE = "arc-notification-hub-namespace";
+                    string resourceUri = $"https://{NH_NAMESPACE}.servicebus.windows.net/{HUB_NAME}/messages/";
+                    using (var request = CreateHttpRequest(HttpMethod.Post, resourceUri, deviceId))
                     {
-                        foreach (User db_user in await query.ExecuteNextAsync())
-                        {
-                            mailArray.Concat(db_user.FollowedBy);
-                        }
+                        JObject jobject = new JObject();
+                        JObject jdata = new JObject();
+                        jdata.Add("deviceId", deviceId);
+                        jobject.Add("data", jdata); 
+                        
+                        var content = jobject.ToString();
+
+                        request.Content = new StringContent(content, Encoding.UTF8, "application/json");
+                        var httpClient = new HttpClient();
+                        var response = await httpClient.SendAsync(request);
+                        log.LogInformation(response.StatusCode.ToString());
                     }
-
-                    //TODO: Eventually this should be join instead of direct email
-
-                    //Send notifications to all email
-
-                    await notification.AddAsync(GetTemplateProperties(myQueueItem));
-
-                    await Task.Yield();
+                                        
                 }
                 catch (Exception e)
                 {
@@ -76,11 +71,15 @@ namespace Arc.Function
             if (exceptions.Count == 1)
                 throw exceptions.Single();
         }
-        private static IDictionary<string, string> GetTemplateProperties(string message)
-{
-    Dictionary<string, string> templateProperties = new Dictionary<string, string>();
-    templateProperties["user"] = "A new user wants to be added : " + message;
-    return templateProperties;
-}
+        private static HttpRequestMessage CreateHttpRequest(HttpMethod method, String resourceUri, String deviceId)
+        {
+            var request = new HttpRequestMessage(method, $"{resourceUri}?api-version=2017-04");
+            request.Headers.Add("Authorization", "SharedAccessSignature sr=https%3A%2F%2Farc-notification-hub-namespace.servicebus.windows.net%2Farc-notification-hub&sig=GWKH1XbiCn5qFOm6DSk3UHHc%2BHCcORZ53tlGBTJGCcE%3D&se=11661451928&skn=DefaultFullSharedAccessSignature");
+            // request.Headers.Add("Content-Type", "application/json;charset=utf-8");
+            request.Headers.Add("ServiceBusNotification-Tags", deviceId);
+            request.Headers.Add("ServiceBusNotification-Format", "gcm");
+
+            return request;
+        }
     }
 }
