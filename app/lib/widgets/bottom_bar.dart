@@ -1,10 +1,10 @@
-// ===== bottom_bar.dart ==============================
+// ===== bottom_bar.dart ==================================
 // A bottom bar with a profile button to be included
 // in most of the app's screens.
 
 import 'package:flutter/material.dart';
 import 'package:app/utilities/avatar.dart';
-import 'package:app/utilities/models.dart';
+import 'package:app/models/profile_device.dart';
 
 
 class BottomBar extends StatelessWidget {

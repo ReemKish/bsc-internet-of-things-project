@@ -1,4 +1,4 @@
-// ===== avatar.dart ==============================
+// ===== avatar.dart ======================================
 // Generate avatars from names.
 
 import 'dart:core';

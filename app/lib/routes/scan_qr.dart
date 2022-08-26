@@ -1,6 +1,5 @@
-// ===== scan_qr.dart ==============================
-
-import 'dart:io';
+// ===== scan_qr.dart =====================================
+// QR code scanner screen.
 
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';

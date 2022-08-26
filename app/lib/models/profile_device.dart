@@ -1,5 +1,5 @@
-// ===== models.dart ==============================
-// Data models used throughout the app.
+// ===== profile_device.dart ==============================
+// Containcs Profile and Device models.
 
 class Profile {
   String name;

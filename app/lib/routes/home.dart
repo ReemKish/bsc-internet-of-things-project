@@ -1,21 +1,22 @@
-// ===== home.dart ==============================
+// ===== home.dart ========================================
 // Home page of the app. Shows list of linked devices.
 
-import 'package:app/utilities/cloud.dart';
 import 'package:flutter/material.dart';
 import 'package:app/utilities/alerts.dart';
 import 'package:app/widgets/bottom_bar.dart';
-import 'package:app/utilities/models.dart';
+import 'package:app/models/profile_device.dart';
 import 'package:app/utilities/avatar.dart';
 import 'package:app/routes/scan_qr.dart';
-import 'package:app/widgets/dialog_item.dart';
-/* import 'package:provider/provider.dart'; */
+import 'package:app/widgets/dialog.dart';
+import 'package:app/services/cloud_service.dart';
+import 'package:app/services/notification_service.dart';
 
 
 class HomeRoute extends StatefulWidget {
   final Profile profile;
   HomeRoute(this.profile, {Key? key}) : super(key: key) {
-    fallAction((String deviceId) {});
+    NotificationService.registerForegroundHandler((String deviceId) {});
+    /* registerBackgroundHandler((String deviceId) {}); */
 }
 
   @override
@@ -47,10 +48,10 @@ class HomeRouteState extends State<HomeRoute> {
   void _followDevice(String id) {
     /* update device list */
     setState(() {
-      _tracked.add(id2device(id));
+      _tracked.add(CloudService.id2device(id));
     });
     /* subscribe to notifications */
-    followDevice(widget.profile.email, id);
+    NotificationService.followDevice(widget.profile.email, id);
   }
 
   void _scanDeviceQR() {

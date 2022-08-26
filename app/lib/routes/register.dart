@@ -1,4 +1,4 @@
-// ===== register.dart ==========================
+// ===== register.dart ====================================
 // A registration form page, opens upon first launch of the app.
 
 import 'package:flutter/material.dart';
@@ -6,10 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:app/utilities/formatters.dart';
 import 'package:app/utilities/alerts.dart';
 import 'package:app/widgets/password_field.dart';
-import 'package:app/api/notification_hub.dart';
-import 'package:app/utilities/cloud.dart';
-import 'package:app/utilities/models.dart';
-import 'package:app/api/functions.dart';
+import 'package:app/services/cloud_service.dart';
+import 'package:app/services/notification_service.dart';
+import 'package:app/models/profile_device.dart';
 
 
 class RegisterRoute extends StatelessWidget {
@@ -53,8 +52,8 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   void _register() async {
-    subscribeToNotifications(profile.email);
-    CloudFunctions.signUp(profile.name, profile.phoneNumber, profile.email, profile.password);
+    NotificationService.subscribe(profile.email);
+    CloudService.signUp(profile.name, profile.phoneNumber, profile.email, profile.password);
   }
 
 
@@ -153,7 +152,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
 
     final fEmail = TextFormField(
-      initialValue: "reem.kishinevsky@gmail.com",  // TODO - remove this
+      initialValue: "reemkish@gmail.com",  // TODO - remove this
       textInputAction: TextInputAction.next,
       decoration: const InputDecoration(
         filled: true,

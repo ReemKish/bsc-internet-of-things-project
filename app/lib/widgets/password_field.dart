@@ -1,4 +1,4 @@
-// ===== password_field.dart ====================
+// ===== password_field.dart ==============================
 // A password field widget for use in registration/login forms.
 
 import 'package:flutter/material.dart';

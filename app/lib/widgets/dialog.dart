@@ -1,4 +1,6 @@
-// ===== dialog_item.dart ==============================
+// ===== dialog.dart ======================================
+// Dialog widgets.
+
 import 'package:flutter/material.dart';
 
 class DialogItem extends StatelessWidget {

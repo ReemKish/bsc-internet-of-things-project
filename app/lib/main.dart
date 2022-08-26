@@ -1,10 +1,10 @@
-// ===== main.dart ==============================
+// ===== main.dart ========================================
 // Sets style settings and invokes the launch of the app.
 
 import 'package:flutter/material.dart';
 import 'package:app/routes/register.dart';
 import 'package:app/routes/home.dart';
-import 'package:app/utilities/models.dart';
+import 'package:app/models/profile_device.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -18,8 +18,6 @@ void main() async {
   await FirebaseMessaging.instance.getToken();
   runApp(const App());
 }
-
-
 
 
 class App extends StatelessWidget {
@@ -62,7 +60,7 @@ class App extends StatelessWidget {
 
       themeMode: ThemeMode.system,
       /* home: const RegisterRoute(), */
-      home: HomeRoute(Profile("Reem Kishinevsky", "reem.kishinevsky@gmail.com", "054 642 1200", "stonewow1")),
+      home: HomeRoute(Profile("Reem Kishinevsky", "reemkish@gmail.com", "054 642 1200", "stonewow1")),
     );
   }
 }

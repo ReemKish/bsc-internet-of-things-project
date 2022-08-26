@@ -1,4 +1,5 @@
-// ===== alerts.dart ==============================
+// ===== alerts.dart ======================================
+// Various alerts and dialogs used throught the app.
 
 import 'package:flutter/material.dart';
 
