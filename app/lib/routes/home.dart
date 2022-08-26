@@ -34,43 +34,7 @@ class HomeRouteState extends State<HomeRoute> with WidgetsBindingObserver{
   ];
 
 
-  AppLifecycleState? _notification; 
   var _viewed = <DeviceItem>[];
-
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-  switch (state) {
-        case AppLifecycleState.resumed:
-          print("app in resumed");
-          /* Alarm.mute(); */
-          break;
-        case AppLifecycleState.inactive:
-          print("app in inactive");
-          break;
-        case AppLifecycleState.paused:
-          print("app in paused");
-          break;
-        case AppLifecycleState.detached:
-          print("app in detached");
-          break;
-      }
-    setState(() {
-      _notification = state;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
 
   void constructViewed() {
     _viewed = _tracked.map((device) => DeviceItem(this, device, key: Key(device.id))).toList();
@@ -105,11 +69,6 @@ class HomeRouteState extends State<HomeRoute> with WidgetsBindingObserver{
   }
 
   void _addDevice() async {
-    /* return;  // TODO - remove this */
-    print("Trying to mute");
-    await Alarm.mute();
-    sleep(const Duration(seconds: 5));
-    return;
     Navigator.of(context).push(
       DialogRoute<String>(
         context: context,
