@@ -3,6 +3,7 @@
 
 import 'dart:io';
 
+import 'package:app/routes/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:app/utilities/formatters.dart';
@@ -61,19 +62,29 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
 
-  Future<bool> _handleSubmitted({Function? action}) async {
-    final form = _formKey.currentState!;
-    if (!form.validate()) {
-      showInSnackBar(
-        context,
-        "Please fix the errors in red before submitting."
-      );
-    } else {
-      form.save();
-      return _register(); 
-    }
-    return false;
+  void _registerSuccess() {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => HomeRoute(profile),
+        transitionDuration: const Duration(milliseconds: 700),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.ease;
+          final tween = Tween(begin: begin, end: end);
+          final curvedAnimation = CurvedAnimation(
+              parent: animation,
+              curve: curve,
+            );
+          return SlideTransition(
+            position: tween.animate(curvedAnimation),
+            child: child,
+          );
+        }
+      )
+    );
   }
+
 
   String? _validateName(String? value) {
     if (value == null || value.isEmpty) {
@@ -194,9 +205,6 @@ class _RegisterFormState extends State<RegisterForm> {
       ),
       maxLength: 16,
       obscureText: true,
-      onFieldSubmitted: (value) {
-        _handleSubmitted();
-      },
       validator: _validatePassword,
     );
 
@@ -222,23 +230,34 @@ class _RegisterFormState extends State<RegisterForm> {
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      final progress = ProgressHUD.of(context);
-                      progress?.showWithText("Creating account...");
-                      _handleSubmitted().then((ok) {
-                        progress?.dismiss(); 
-                        if (ok) {
-                          showInSnackBar(context, "Registration successful!");
-                        } else {
-                          showInSnackBar(context, "Registration failed!");
-                        }
-                      });
+                      final form = _formKey.currentState!;
+                      if (!form.validate()) {
+                        showInSnackBar(
+                          context,
+                          "Please fix the errors in red before submitting."
+                        );
+                      } else {
+                        final progress = ProgressHUD.of(context);
+                        progress?.showWithText("Creating account...");
+                        form.save();
+                        _register().then((ok) {
+                          progress?.dismiss(); 
+                          if (ok) {
+                            /* showInSnackBar(context, "Registration successful!"); */
+                            Future.delayed(const Duration(milliseconds: 00),
+                              () => _registerSuccess()
+                            );
+                          } else {
+                            showInSnackBar(context, "Registration failed!");
+                          }
+                        });
+                      }
                     },
                     child: const Text("Submit"),
                   ),
                 ),
                 halfSizedBoxSpace,
                 Text(
-                  /* localizations.demoTextFieldRequiredField, */
                   "* indicates required field",
                   style: Theme.of(context).textTheme.caption,
                 ),
