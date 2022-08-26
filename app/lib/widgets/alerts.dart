@@ -1,7 +1,68 @@
-// ===== dialog.dart ======================================
-// Dialog widgets.
+// ===== alerts.dart ======================================
+// Various alerts and dialogs used throught the app.
 
 import 'package:flutter/material.dart';
+
+
+confirmDiaglog({
+  required BuildContext context,
+  required String prompt,
+  required Function() action
+}) {
+  showDialog(
+    context: context,
+    builder: (_) =>
+      AlertDialog(
+        content: Text(prompt),
+        actions: [
+          TextButton(onPressed: () {
+            Navigator.of(context).pop();
+            action();
+          },
+            child: const Text("Yes")),
+          TextButton(onPressed: () {
+              Navigator.of(context).pop();
+          },
+            child: const Text("No")),
+        ]
+      ),
+  );
+}
+
+
+alertDiaglog({
+  required BuildContext context,
+  required String alert,
+}) {
+  showDialog(
+    context: context,
+    builder: (_) =>
+      AlertDialog(
+        content: Text(alert),
+        actions: [
+          TextButton(onPressed: () {
+            Navigator.of(context).pop();
+          },
+            child: const Text("Dismiss")),
+        ]
+      ),
+  );
+}
+
+
+void showInSnackBar(
+  BuildContext context,
+  String msg,
+) {
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(msg),
+      duration: const Duration(seconds: 1),
+    )
+  );
+}
+
 
 class DialogItem extends StatelessWidget {
   const DialogItem({
