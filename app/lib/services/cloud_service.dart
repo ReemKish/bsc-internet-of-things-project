@@ -4,11 +4,26 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:app/models/profile_device.dart';
+import 'package:app/utilities/api_monitor.dart';
 
 class CloudService {
   static const namespace = "arc-fun";
 
-  static Future<http.Response> signUp(String name, String phoneNumber, String email, String password) async => http.post(
+  static Future<bool> signUp(String name, String phoneNumber, String email, String password) async {
+    return apiCallSuccess(
+      "signUp($name, $phoneNumber, $email, $password)",
+      await _signUp(name, phoneNumber, email, password)
+    );
+  }
+
+  static Future<bool> logIn(String email, String password) async {
+    return apiCallSuccess(
+      "login($email, $password)",
+      await _logIn(email, password),
+    );
+  }
+
+  static Future<http.Response> _signUp(String name, String phoneNumber, String email, String password) async => http.post(
     Uri.parse("https://$namespace.azurewebsites.net/api/SignUp"),
     body: jsonEncode(<String, dynamic>{
       "name": name,
@@ -18,13 +33,20 @@ class CloudService {
     })
   );
 
-  static Future<http.Response> logIn(String name, String phoneNumber, String email, String password) async => http.post(
-    Uri.parse("https://$namespace.azurewebsites.net/api/SignUp"),
+  static Future<http.Response> _logIn(String email, String password) async => http.post(
+    Uri.parse("https://$namespace.azurewebsites.net/api/LogIn"),
     body: jsonEncode(<String, dynamic>{
-      "name": name,
-      "phoneNumber": phoneNumber,
       "email": email,
       "password": password
+    })
+  );
+
+
+  static Future<http.Response> _follow(String email, String deviceId) async => http.post(
+    Uri.parse("https://arc-fun.azurewebsites.net/api/Follow"),
+    body: jsonEncode(<String, dynamic>{
+      "email": email,
+      "deviceId": deviceId
     })
   );
 

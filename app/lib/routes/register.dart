@@ -1,6 +1,8 @@
 // ===== register.dart ====================================
 // A registration form page, opens upon first launch of the app.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:app/utilities/formatters.dart';
@@ -9,6 +11,7 @@ import 'package:app/widgets/password_field.dart';
 import 'package:app/services/cloud_service.dart';
 import 'package:app/services/notification_service.dart';
 import 'package:app/models/profile_device.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 
 
 class RegisterRoute extends StatelessWidget {
@@ -51,13 +54,14 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
-  void _register() async {
-    NotificationService.subscribe(profile.email);
-    CloudService.signUp(profile.name, profile.phoneNumber, profile.email, profile.password);
+  Future<bool> _register() async {
+    final notificationsOK = await NotificationService.subscribe(profile.email);
+    final signupOK = await CloudService.signUp(profile.name, profile.phoneNumber, profile.email, profile.password);
+    return signupOK && notificationsOK;
   }
 
 
-  void _handleSubmitted() {
+  Future<bool> _handleSubmitted({Function? action}) async {
     final form = _formKey.currentState!;
     if (!form.validate()) {
       showInSnackBar(
@@ -66,9 +70,9 @@ class _RegisterFormState extends State<RegisterForm> {
       );
     } else {
       form.save();
-      _register();
-      showInSnackBar(context, "Registration successful!");
+      return _register(); 
     }
+    return false;
   }
 
   String? _validateName(String? value) {
@@ -196,37 +200,52 @@ class _RegisterFormState extends State<RegisterForm> {
       validator: _validatePassword,
     );
 
-    return Form(
-      key: _formKey,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            sizedBoxSpace,
-            fName,            // Name field
-            sizedBoxSpace,
-            fPhone,           // Phone number field
-            sizedBoxSpace,
-            fEmail,           // Email address field
-            sizedBoxSpace,
-            fPassword,        // Password field
-            sizedBoxSpace,
-            fRetypePassword,  // Re-type password field
-            sizedBoxSpace,
-            Center(
-              child: ElevatedButton(
-                onPressed: _handleSubmitted,
-                child: const Text("Submit"),
-              ),
+    return ProgressHUD( 
+      child: Builder(
+        builder: (context) => Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                sizedBoxSpace,
+                fName,            // Name field
+                sizedBoxSpace,
+                fPhone,           // Phone number field
+                sizedBoxSpace,
+                fEmail,           // Email address field
+                sizedBoxSpace,
+                fPassword,        // Password field
+                sizedBoxSpace,
+                fRetypePassword,  // Re-type password field
+                sizedBoxSpace,
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final progress = ProgressHUD.of(context);
+                      progress?.showWithText("Creating account...");
+                      _handleSubmitted().then((ok) {
+                        progress?.dismiss(); 
+                        if (ok) {
+                          showInSnackBar(context, "Registration successful!");
+                        } else {
+                          showInSnackBar(context, "Registration failed!");
+                        }
+                      });
+                    },
+                    child: const Text("Submit"),
+                  ),
+                ),
+                halfSizedBoxSpace,
+                Text(
+                  /* localizations.demoTextFieldRequiredField, */
+                  "* indicates required field",
+                  style: Theme.of(context).textTheme.caption,
+                ),
+                sizedBoxSpace,
+              ],
             ),
-            halfSizedBoxSpace,
-            Text(
-              /* localizations.demoTextFieldRequiredField, */
-              "* indicates required field",
-              style: Theme.of(context).textTheme.caption,
-            ),
-            sizedBoxSpace,
-          ],
+          ),
         ),
       ),
     );

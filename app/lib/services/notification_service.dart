@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:app/utilities/api_monitor.dart';
 
 class NotificationService {
   static const name = "arc-notification-hub";
@@ -15,21 +16,20 @@ class NotificationService {
   static Future<bool> subscribe(String email) async {
     email = email.replaceAll('@', '_at_');
     String? gcmToken = await FirebaseMessaging.instance.getToken();
-    final statusCode = (await _addInstallation(email, gcmToken!)).statusCode;
-    debugPrint(statusCode == 200 ?
-      "subscribe($email) - success" :
-      "subscribe($email) - failed with status $statusCode");
-    return statusCode == 200;
+    return apiCallSuccess(
+      "subscribe($email)",
+      await _addInstallation(email, gcmToken!),
+    );
+    
   }
 
   static Future<bool> followDevice(String email, String deviceId) async {
     email = email.replaceAll('@', '_at_');
     String? gcmToken = await FirebaseMessaging.instance.getToken();
-    final statusCode = (await _patchInstallation(email, gcmToken!, deviceId)).statusCode;
-    debugPrint(statusCode == 200 ?
-      "followDevice($email, $deviceId) - success" :
-      "followDevice($email, $deviceId) - failed with status $statusCode");
-    return statusCode == 200;
+    return apiCallSuccess(
+      "subscribe($email)",
+      await _patchInstallation(email, gcmToken!, deviceId),
+    );
   }
 
   static void registerForegroundHandler(Function(String deviceId) action) {
