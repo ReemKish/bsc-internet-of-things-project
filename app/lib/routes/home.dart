@@ -26,8 +26,8 @@ class HomeRoute extends StatefulWidget {
 
 class HomeRouteState extends State<HomeRoute> with WidgetsBindingObserver{
   final _tracked = <Device>[
-    Device("ARC-001", Profile("Reem Kishinevsky", "reem.kishinevsky@gmail.com", "054-642-1200", "pas1")),
-    Device('ARC-002', Profile("David Molina", "davidm@gmail.com", "054-123-4567", "pas2"))
+    Device("ARC-001", Profile(name: "Reem Kishinevsky", email: "reem.kishinevsky@gmail.com", phoneNumber: "054-642-1200")),
+    Device('ARC-002', Profile(name: "David Molina", email: "davidm@gmail.com", phoneNumber: "054-123-4567")),
   ];
 
 

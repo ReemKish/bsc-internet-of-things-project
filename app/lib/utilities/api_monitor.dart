@@ -7,6 +7,6 @@ import 'package:http/http.dart';
 bool apiCallSuccess(String func, Response response) {
   debugPrint(response.statusCode == 200 ?
     "$func - success" :
-    "$func - failed with status $response.statusCode");
+    "$func - failed with status ${response.statusCode}");
   return response.statusCode == 200;
 }

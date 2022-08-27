@@ -41,7 +41,8 @@ class _RegisterFormState extends State<RegisterForm> {
   /* final notificationRegistrationService = NotificationRegistrationService(Config.backendServiceEndpoint, Config.apiKey); */
 
   late FocusNode _retypePassword;
-  Profile profile = Profile("", "", "","");
+  Profile profile = Profile();
+
 
   @override
   void initState() {
@@ -57,7 +58,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
   Future<bool> _register() async {
     final notificationsOK = await NotificationService.subscribe(profile.email);
-    final signupOK = await CloudService.signUp(profile.name, profile.phoneNumber, profile.email, profile.password);
+    final signupOK = await CloudService.signUp(profile.name, profile.phoneNumber, profile.email, profile.password!);
     return signupOK && notificationsOK;
   }
 
