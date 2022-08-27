@@ -38,7 +38,11 @@ namespace Arc.Function
         [CosmosDB(
                 databaseName: "arc_db_id",
                 collectionName: "users",
-                ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client)
+                ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client,
+        [CosmosDB(
+                databaseName: "arc_db_id",
+                collectionName: "fallevents",
+                ConnectionStringSetting = "CosmosDbConnectionString")]IAsyncCollector<dynamic> fallEventsDocumentsOut)
         {
             var exceptions = new List<Exception>();
 
@@ -52,6 +56,15 @@ namespace Arc.Function
                     dynamic data = JsonConvert.DeserializeObject(eventBody);
                     string deviceId = data.deviceId;
                     FullUser owner = await Database.getSingleUserByDeviceId(client, deviceId, log);
+                    // Add a JSON document to the output container.
+                await fallEventsDocumentsOut.AddAsync(new
+                {
+                    // create a random ID
+                    id = System.Guid.NewGuid().ToString(),
+                    user_id = owner.Id,
+                    device_id = deviceId,
+                    timestamp = System.DateTime.Now.ToString()
+                });
                     string resourceUri = $"https://{NH_NAMESPACE}.servicebus.windows.net/{HUB_NAME}/messages/";
                     using (var request = CreateHttpRequest(HttpMethod.Post, resourceUri, deviceId))
                     {
