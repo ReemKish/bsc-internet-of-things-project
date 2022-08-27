@@ -9,6 +9,7 @@ import 'package:app/models/profile_device.dart';
 
 class CloudService {
   static const namespace = "arc-fun";
+  static const apiKeyHeader = {"x-functions-key":"T0m9ThzqRnkVT3EmPhdI3YGx3exjZi8Ttz2ZGhdrH6UaAzFukgO3Ww=="};
 
   static Future<bool> signUp(String name, String phoneNumber, String email, String password) async {
     return apiCallSuccess(
@@ -33,6 +34,7 @@ class CloudService {
 
   static Future<http.Response> _signUp(String name, String phoneNumber, String email, String password) async => http.post(
     Uri.parse("https://$namespace.azurewebsites.net/api/SignUp"),
+    headers: apiKeyHeader,
     body: jsonEncode(<String, dynamic>{
       "name": name,
       "phoneNumber": phoneNumber,
@@ -43,6 +45,7 @@ class CloudService {
 
   static Future<http.Response> _logIn(String email, String password) async => http.post(
     Uri.parse("https://$namespace.azurewebsites.net/api/LogIn"),
+    headers: apiKeyHeader,
     body: jsonEncode(<String, dynamic>{
       "email": email,
       "password": password
@@ -52,6 +55,7 @@ class CloudService {
 
   static Future<http.Response> _follow(String email, String deviceId) async => http.post(
     Uri.parse("https://$namespace.azurewebsites.net/api/Follow"),
+    headers: apiKeyHeader,
     body: jsonEncode(<String, dynamic>{
       "email": email,
       "deviceId": deviceId,

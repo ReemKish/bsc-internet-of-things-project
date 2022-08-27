@@ -1,5 +1,5 @@
 // ===== profile_device.dart ==============================
-// Containcs Profile and Device models.
+// Containcs Profile and DeviceEntry models.
 
 class Profile {
   String name;
@@ -22,9 +22,10 @@ class Profile {
   }
 }
 
-class Device {
-  String id;
+class DeviceEntry {
+  String deviceId;
   Profile holder;
   bool notify;
-  Device(this.id, this.holder, {this.notify = true});
+  bool emergenecy;
+  DeviceEntry(this.deviceId, this.holder, {this.notify = true, this.emergenecy = false});
 }
