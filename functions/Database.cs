@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using System.Linq;
@@ -30,13 +31,13 @@ namespace Arc.Function {
             }
             return null;
         }
-        public static async Task<Device> getDeviceById(DocumentClient client, string deviceId, ILogger log){
-            Uri usersUri = UriFactory.CreateDocumentCollectionUri(DB_NAME, Containers.devices.ToString());
+        public static async Task<Device> GetDeviceById(DocumentClient client, string deviceId, ILogger log){
+            Uri uri = UriFactory.CreateDocumentCollectionUri(DB_NAME, Containers.devices.ToString());
 
             log.LogInformation($"Searching for: {deviceId}");
             FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true }; // Enable cross partition query
 
-            IDocumentQuery<Device> query = client.CreateDocumentQuery<Device>(usersUri, options)
+            IDocumentQuery<Device> query = client.CreateDocumentQuery<Device>(uri, options)
                 .Where(p => p.DeviceId.Equals(deviceId))
                 .AsDocumentQuery();
             while (query.HasMoreResults) {
@@ -47,8 +48,27 @@ namespace Arc.Function {
             return null;
         }
 
+        public static async Task<Device> DeleteDeviceById(DocumentClient client, string deviceId, ILogger log){
+            Uri uri = UriFactory.CreateDocumentCollectionUri(DB_NAME, Containers.devices.ToString());
+
+            log.LogInformation($"Searching for: {deviceId}");
+            FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true }; // Enable cross partition query
+
+            IDocumentQuery<Device> query = client.CreateDocumentQuery<Device>(uri, options)
+                .Where(p => p.DeviceId.Equals(deviceId))
+                .AsDocumentQuery();
+            while (query.HasMoreResults) {
+                foreach (Device device in await query.ExecuteNextAsync()) {
+                    Uri deleteUri = UriFactory.CreateDocumentUri(DB_NAME, Containers.devices.ToString(),device.Id);
+                    await client.DeleteDocumentAsync(deleteUri, new RequestOptions { PartitionKey = new PartitionKey(device.Id) });
+                    return device;
+                }
+            }
+            return null;
+        }
+
         public static async Task<FullUser> getSingleUserByDeviceId(DocumentClient client, string deviceId, ILogger log){
-            Device device = await getDeviceById(client, deviceId, log);
+            Device device = await GetDeviceById(client, deviceId, log);
             if (device == null) {
                 return null;
             }

@@ -17,7 +17,7 @@ namespace Arc.Function
     {
         [FunctionName("Follow")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             [CosmosDB(
                 databaseName: "arc_db_id",
                 collectionName: "users",

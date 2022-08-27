@@ -15,7 +15,7 @@ namespace Arc.Function
     {
         [FunctionName("RegisterDevice")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             [CosmosDB(
         databaseName: "arc_db_id",
         collectionName: "devices",
@@ -38,37 +38,50 @@ namespace Arc.Function
 
             var options = new FeedOptions { EnableCrossPartitionQuery = true }; // Enable cross partition query
 
-            if (string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(email)) {
+            if (string.IsNullOrEmpty(email)) {
                 return new BadRequestResult();
             } else {
-                //Check if device is owned already
-                Device device = await Database.getDeviceById(client, deviceId, log);
-                if (device != null){
-                    return new ConflictResult();
-                }
-            
-                //Search for user_id based on email
-                Uri usersUri = UriFactory.CreateDocumentCollectionUri("arc_db_id", "users");
-
-                FullUser user = await Database.getSingleUserByEmail(client, email, log);
-                if (user == null){
-                    return new BadRequestResult();
-                }
-                // Add a JSON document to the output container.
-                await devicesDocumentsOut.AddAsync(new
-                {
-                    // create a random ID
-                    id = System.Guid.NewGuid().ToString(),
-                    device_id = deviceId,
-                    user_id = user.Id,
-                });
-                
-                // Send update of new user
-                user.DeviceId = deviceId;
-                await usersDocumentsOut.AddAsync(JsonConvert.SerializeObject(user));
-                
-                return new OkObjectResult($"DeviceId {deviceId} was registered successfully to user {email}.");
+                if (!string.IsNullOrEmpty(deviceId)){
+                    //Check if device is owned already
+                    Device device = await Database.GetDeviceById(client, deviceId, log);
+                    if (device != null){
+                        return new ConflictResult();
+                    }
+                    FullUser user = await Database.getSingleUserByEmail(client, email, log);
+                    if (user == null){
+                        return new BadRequestResult();
+                    }
+                    // Add a JSON document to the output container.
+                    await devicesDocumentsOut.AddAsync(new
+                    {
+                        // create a random ID
+                        id = System.Guid.NewGuid().ToString(),
+                        device_id = deviceId,
+                        user_id = user.Id,
+                    });
                     
+                    // Send update of new user
+                    user.DeviceId = deviceId;
+                    await usersDocumentsOut.AddAsync(JsonConvert.SerializeObject(user));
+                    
+                    return new OkObjectResult($"DeviceId {deviceId} was registered successfully to user {email}.");
+                } else {
+                    FullUser user = await Database.getSingleUserByEmail(client, email, log);
+                    if (user == null){
+                        return new BadRequestResult();
+                    }
+                    if (user.DeviceId == null)
+                    return new OkObjectResult($"User {email} has no linked devices.");
+                    else {
+                        Device device = await Database.DeleteDeviceById(client, user.DeviceId, log);
+                        user.DeviceId = null;
+                        await usersDocumentsOut.AddAsync(JsonConvert.SerializeObject(user, Formatting.Indented, new JsonSerializerSettings
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            }));
+                        return new OkObjectResult($"User {email} has no linked devices now.");
+                    }
+                }                    
             }
         }
     }

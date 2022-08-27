@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.Azure.Documents.Client;
 
 namespace Arc.Function
 {
@@ -14,11 +15,15 @@ namespace Arc.Function
     {
         [FunctionName("SignUp")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             [CosmosDB(
-        databaseName: "arc_db_id",
-        collectionName: "users",
-        ConnectionStringSetting = "CosmosDbConnectionString")]IAsyncCollector<dynamic> documentsOut, ILogger log)
+                databaseName: "arc_db_id",
+                collectionName: "users",
+                ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client,
+            [CosmosDB(
+            databaseName: "arc_db_id",
+            collectionName: "users",
+            ConnectionStringSetting = "CosmosDbConnectionString")]IAsyncCollector<dynamic> documentsOut, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
@@ -33,6 +38,10 @@ namespace Arc.Function
 
             if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(phoneNumber) && !string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
+                FullUser db_user = await Database.getSingleUserByEmail(client, email, log);
+                if (db_user != null) {
+                    return new ConflictResult();
+                }
                 // Add a JSON document to the output container.
                 await documentsOut.AddAsync(new
                 {

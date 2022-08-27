@@ -15,7 +15,7 @@ namespace Arc.Function
     {
         [FunctionName("Login")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Admin, "get", "post", Route = null)] HttpRequest req,
             [CosmosDB(
                 databaseName: "arc_db_id",
                 collectionName: "users",
