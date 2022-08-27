@@ -9,6 +9,6 @@ namespace Arc.Function
         [JsonProperty("device_id")]
         public string DeviceId { get; set; }
         [JsonProperty("user_id")]
-        public string Name { get; set; }
+        public string UserId { get; set; }
     }
 }
