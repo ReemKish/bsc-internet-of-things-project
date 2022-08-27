@@ -33,6 +33,7 @@ namespace Arc.Function
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             string deviceId = data?.deviceId;
             string email = data?.email;
+            bool delete = data?.delete != null ? data?.delete : false;
 
             var options = new FeedOptions { EnableCrossPartitionQuery = true }; // Enable cross partition query
 
@@ -46,38 +47,41 @@ namespace Arc.Function
                 if (owner == null) {
                     return new BadRequestResult();
                 }
-                //Search for follower based on email
+                //Find follower
                 FullUser follower = await Database.getSingleUserByEmail(client, email, log);
                 if (follower == null) {
                     return new BadRequestResult();
                 }
-                // Send update of new user and owner
-                List<string> followingList;
-                if (follower.Following == null){
-                    followingList = new List<string>();
-                    followingList.Add(owner.Id);
-                } else {
-                followingList = follower.Following.ToList();
-                followingList.Add(owner.Id);
+
+                //Do not add if already following
+                if (follower.Following.Contains(owner.Id) && !delete){
+                    return new ConflictResult();
                 }
+
+                // Prepare follower update
+                List<string> followingList = null;
+                if (follower.Following == null) followingList = new List<string>();
+                else followingList = follower.Following.ToList();
+                if (delete) followingList.RemoveAll(s => s.Equals(owner.Id));
+                else followingList.Add(owner.Id);
                 follower.Following = followingList.ToArray();
 
+                // Prepare owner update
                 List<string> followedByList;
-                if (owner.FollowedBy == null){
-                    followedByList = new List<string>();
-                    followedByList.Add(follower.Id);
-                } else {
-                followedByList = owner.FollowedBy.ToList();
-                followedByList.Add(follower.Id);
-                }
+                if (owner.FollowedBy == null) followedByList = new List<string>();
+                else followedByList = owner.FollowedBy.ToList();
+                if (delete) followedByList.RemoveAll(s => s.Equals(follower.Id));
+                else followedByList.Add(follower.Id);
                 owner.FollowedBy = followedByList.ToArray();
                 
+                // Send updates
                 await followerDocumentsOut.AddAsync(JsonConvert.SerializeObject(follower));
                 await followerDocumentsOut.AddAsync(JsonConvert.SerializeObject(owner));
                 
-                //Return owner of device as response
+                //Return owner of device as response to the query
                 BasicUser basicOwner = owner.getBasicUser();
-                return new OkObjectResult(JsonConvert.SerializeObject(basicOwner, Formatting.Indented));
+                string response = delete ? "" : JsonConvert.SerializeObject(basicOwner, Formatting.Indented);
+                return new OkObjectResult(response);
             }
         }
     }
