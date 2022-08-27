@@ -15,6 +15,8 @@ class PasswordField extends StatefulWidget {
     this.onFieldSubmitted,
     this.focusNode,
     this.textInputAction,
+    this.maxLength = 16,
+    this.icon
   }) : super(key: key);
 
   final Key? fieldKey;
@@ -26,6 +28,8 @@ class PasswordField extends StatefulWidget {
   final ValueChanged<String>? onFieldSubmitted;
   final FocusNode? focusNode;
   final TextInputAction? textInputAction;
+  final Icon? icon;
+  final int? maxLength;
 
   @override
   State<PasswordField> createState() => _PasswordFieldState();
@@ -41,7 +45,7 @@ class _PasswordFieldState extends State<PasswordField> {
       key: widget.fieldKey,
       textInputAction: widget.textInputAction,
       obscureText: _obscureText,
-      maxLength: 16,
+      maxLength: widget.maxLength,
       onSaved: widget.onSaved,
       validator: widget.validator,
       onFieldSubmitted: widget.onFieldSubmitted,
@@ -50,6 +54,7 @@ class _PasswordFieldState extends State<PasswordField> {
         hintText: widget.hintText,
         labelText: widget.labelText,
         helperText: widget.helperText,
+        icon: widget.icon,
         suffixIcon: IconButton(
           onPressed: () {
             setState(() {
