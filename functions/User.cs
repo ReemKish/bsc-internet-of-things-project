@@ -27,6 +27,15 @@ namespace Arc.Function
 
       public class PopulatedFollowUser : BasicUser
     {
+        public PopulatedFollowUser(FullUser user, BasicUser[] following, BasicUser[] followedBy){
+            this.Name = user.Name;
+            this.Email = user.Email;
+            this.PhoneNumber = user.PhoneNumber;
+            this.DeviceId = user.DeviceId;
+            this.Following = following;
+            this.FollowedBy = followedBy;
+        }
+
         [JsonProperty("following")]
         public BasicUser[] Following { get; set; }
         [JsonProperty("followed_by")]
@@ -36,7 +45,16 @@ namespace Arc.Function
     
 
     public class FullUser : FollowExtendedUser
-    {
+    {   
+        public BasicUser getBasicUser(){
+            BasicUser basicUser = new BasicUser();
+            basicUser.Name = this.Name;
+            basicUser.Email = this.Email;
+            basicUser.PhoneNumber = this.PhoneNumber;
+            basicUser.DeviceId = this.DeviceId;
+            return basicUser;
+        }
+
         [JsonProperty("id")]
         public string Id { get; set; }
         [JsonProperty("password")]

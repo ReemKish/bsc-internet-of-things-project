@@ -10,25 +10,28 @@ using Newtonsoft.Json;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Arc.Function
 {
     public static class Login
     {
-
-        public static async getBasicUsersByIds(DocumentClient client, Uri collectionUri, FeedOptions options, ){
+        public static async Task<List<BasicUser>> getBasicUsersByIds(DocumentClient client, Uri collectionUri, FeedOptions options, string[] ids){
             
-            IDocumentQuery<FullUser> query = client.CreateDocumentQuery<FullUser>(collectionUri, options)
-            .Where(p => p.Email.Equals(email))
+            List<BasicUser> userList = new List<BasicUser>();
+            // Just for fun, I'll do it with an SQL expression this time
+            string sqlExpression = "SELECT * FROM c where c.id IN " + "('" + string.Join( "','", ids) + "')";
+            IDocumentQuery<FullUser> query = client.CreateDocumentQuery<FullUser>(collectionUri, sqlExpression, options)
             .AsDocumentQuery();
 
             while (query.HasMoreResults)
             {
                 foreach (FullUser db_user in await query.ExecuteNextAsync())
                 {
-                    
+                    userList.Add(db_user.getBasicUser());
                 }
             }
+            return userList;
         }
 
         [FunctionName("Login")]
@@ -68,18 +71,21 @@ namespace Arc.Function
                     log.LogInformation(db_user.Email);
                     if (db_user.Password.Equals(password)) {
                         //Login granted, get data for display.
-                        PopulatedFollowUser populatedFollowUser = new PopulatedFollowUser(db_user);
-                        if (db_user.Following){
-                            List<BasicUser> followingList = getBasicUsersByIds(client,collectionUri,options,db_user.Following);
-                            populatedFollowUser.Following = followingList;
+                        BasicUser[] followingArray = null;
+                        BasicUser[] followedByArray = null;
+                        if (db_user.Following != null && db_user.Following.Length > 0){
+                            List<BasicUser> followingList = await getBasicUsersByIds(client,collectionUri,options,db_user.Following);
+                            followingArray = followingList.ToArray();
                         }
-                        if (db_user.FollowedBy){
-                        List<BasicUser> followedByList = getBasicUsersByIds(db_user.FollowedBy);
-                        populatedFollowUser.FollowedBy = followedByList;
+                        if (db_user.FollowedBy != null && db_user.FollowedBy.Length > 0){
+                            List<BasicUser> followedByList = await getBasicUsersByIds(client,collectionUri,options,db_user.FollowedBy);
+                            followedByArray = followedByList.ToArray();
                         }
-
-                        FollowExtendedUser u = (FollowExtendedUser)db_user;
-                        return new OkObjectResult(JsonConvert.SerializeObject(u));
+                        PopulatedFollowUser populatedFollowUser = new PopulatedFollowUser(db_user, followingArray, followedByArray);
+                        return new OkObjectResult(JsonConvert.SerializeObject(populatedFollowUser, Formatting.Indented, new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore
+                        }));
                     }
                 }
             }

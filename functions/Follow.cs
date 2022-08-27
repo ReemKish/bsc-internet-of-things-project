@@ -94,12 +94,8 @@ namespace Arc.Function
                         await followerDocumentsOut.AddAsync(JsonConvert.SerializeObject(owner));
                         
                         //Return owner of device as response
-                        //TODO: Still got issues with masking the results in an elegant manner.
-                        return new OkObjectResult(JsonConvert.SerializeObject(
-                            JsonConvert.DeserializeObject<BasicUser>(
-                                JsonConvert.SerializeObject(owner)
-                            )
-                        ));
+                        BasicUser basicOwner = owner.getBasicUser();
+                        return new OkObjectResult(JsonConvert.SerializeObject(basicOwner, Formatting.Indented));
                     }
                     return new NoContentResult();
                 }

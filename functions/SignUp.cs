@@ -29,7 +29,7 @@ namespace Arc.Function
             string email = data?.email;
             string password = data?.password;
 
-            string responseMessage = data.ToString();
+            string responseMessage = $"User {name} successfully signed up with email {email}.";
 
             if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(phoneNumber) && !string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
