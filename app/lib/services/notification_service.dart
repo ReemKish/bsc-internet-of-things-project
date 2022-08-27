@@ -27,7 +27,7 @@ class NotificationService {
     email = email.replaceAll('@', '_at_');
     String? gcmToken = await FirebaseMessaging.instance.getToken();
     return apiCallSuccess(
-      "subscribe($email)",
+      "followDevice($email, $deviceId)",
       await _patchInstallation(email, gcmToken!, deviceId),
     );
   }

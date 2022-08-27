@@ -7,7 +7,7 @@ import 'package:app/routes/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:app/utilities/formatters.dart';
-import 'package:app/utilities/alerts.dart';
+import 'package:app/widgets/alerts.dart';
 import 'package:app/widgets/password_field.dart';
 import 'package:app/services/cloud_service.dart';
 import 'package:app/services/notification_service.dart';
@@ -66,7 +66,7 @@ class _RegisterFormState extends State<RegisterForm> {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => HomeRoute(profile),
-        transitionDuration: const Duration(milliseconds: 700),
+        transitionDuration: const Duration(milliseconds: 600),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(0.0, 1.0);
           const end = Offset.zero;

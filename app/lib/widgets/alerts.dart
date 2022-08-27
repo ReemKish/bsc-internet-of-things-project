@@ -32,13 +32,15 @@ confirmDiaglog({
 
 alertDiaglog({
   required BuildContext context,
-  required String alert,
+  String? title,
+  String? content,
 }) {
   showDialog(
     context: context,
     builder: (_) =>
       AlertDialog(
-        content: Text(alert),
+        title: Text(title?? ""),
+        content: Text(content?? ""),
         actions: [
           TextButton(onPressed: () {
             Navigator.of(context).pop();

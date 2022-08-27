@@ -23,6 +23,15 @@ class CloudService {
     );
   }
 
+  static Future<Profile?> follow(String email, String deviceId) async {
+    // TODO - uncomment line below and replace mock with real
+    /* final response = await _follow(email, deviceId); */
+    final response = await Future.delayed(Duration(seconds: 3), () => http.Response("", 200));
+    if (!apiCallSuccess("follow($email, $deviceId)", response)) return null;
+    return Profile("Bobby Boten", "bobby.boten@gmail.com", "054 753 2311", "bobby_boten2003");
+
+  }
+
   static Future<http.Response> _signUp(String name, String phoneNumber, String email, String password) async => http.post(
     Uri.parse("https://$namespace.azurewebsites.net/api/SignUp"),
     body: jsonEncode(<String, dynamic>{
