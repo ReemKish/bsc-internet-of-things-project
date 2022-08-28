@@ -466,10 +466,10 @@ void loop()
   {
     fall_was_reported = 0;
   }
-  //if (digitalRead(BUTTON_PIN) == LOW)
-  //{ // Check if button has been pressed
-  //  while (digitalRead(BUTTON_PIN) == LOW)
-  //    ; // Wait for button to be released
-  //  sendTelemetry();
-  //}
+  if (digitalRead(BUTTON_PIN) == LOW)
+  { // Check if button has been pressed
+    while (digitalRead(BUTTON_PIN) == LOW)
+      ; // Wait for button to be released
+    sendTelemetry();
+  }
 }

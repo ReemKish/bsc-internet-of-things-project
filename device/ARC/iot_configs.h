@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 // Wifi
-#define IOT_CONFIG_WIFI_SSID "Free-TAU"
-#define IOT_CONFIG_WIFI_PASSWORD "free-tau"
+#define IOT_CONFIG_WIFI_SSID "RedmiYuval"
+#define IOT_CONFIG_WIFI_PASSWORD "12431243"
 
 // Azure IoT
 #define IOT_CONFIG_IOTHUB_FQDN "iot-hub-workshop082022.azure-devices.net"
