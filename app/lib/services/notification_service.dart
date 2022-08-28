@@ -23,12 +23,40 @@ class NotificationService {
     
   }
 
+
+  static Future<bool> unsubscribe(String email) async {
+    email = email.replaceAll('@', '_at_');
+    return apiCallSuccess(
+      "unsubscribe($email)",
+      await _removeInstallation(email),
+    );
+  }
+
+
+  static Future<bool> pauseSubscribtion(String email) async {
+    email = email.replaceAll('@', '_at_');
+    return apiCallSuccess(
+      "pauseSubscription($email)",
+      await _unlinkInstallationFromToken(email),
+    );
+  }
+
+  static Future<bool> resumeSubscription(String email) async {
+    email = email.replaceAll('@', '_at_');
+    String? gcmToken = await FirebaseMessaging.instance.getToken();
+    return apiCallSuccess(
+      "resumeSubscription($email)",
+      await _linkInstallationToToken(email, gcmToken!),
+    );
+  }
+
+
   static Future<bool> followDevice(String email, String deviceId) async {
     email = email.replaceAll('@', '_at_');
     String? gcmToken = await FirebaseMessaging.instance.getToken();
     return apiCallSuccess(
       "followDevice($email, $deviceId)",
-      await _patchInstallation(email, gcmToken!, deviceId),
+      await _patchInstallationTags(email, gcmToken!, deviceId, 'add'),
     );
   }
 
@@ -54,13 +82,39 @@ class NotificationService {
     })
   );
 
-  static Future<http.Response> _patchInstallation(String id, String gcmToken, String tag) async => http.patch(
+
+  static Future<http.Response> _removeInstallation(String id) async => http.delete(
+    Uri.parse("https://$namespace.servicebus.windows.net/$name/installations/$id?api-version=2015-01"),
+    headers: {"Authorization": sasToken},
+  );
+
+  static Future<http.Response> _patchInstallationTags(String id, String gcmToken, String tag, String op) async => http.patch(
+    Uri.parse("https://$namespace.servicebus.windows.net/$name/installations/$id?api-version=2015-01"),
+    headers: {"Content-Type": "application/json-patch+json", "Authorization": sasToken},
+    body: jsonEncode([{
+      "op": op,
+      "path": "/tags",
+      "value": tag,
+    }])
+  );
+
+  static Future<http.Response> _unlinkInstallationFromToken(String id) async => http.patch(
     Uri.parse("https://$namespace.servicebus.windows.net/$name/installations/$id?api-version=2015-01"),
     headers: {"Content-Type": "application/json-patch+json", "Authorization": sasToken},
     body: jsonEncode([{
       "op": "add",
-      "path": "/tags",
-      "value": tag,
+      "path": "/pushChannel",
+      "value": "_"
+    }])
+  );
+
+  static Future<http.Response> _linkInstallationToToken(String id, String gcmToken) async => http.patch(
+    Uri.parse("https://$namespace.servicebus.windows.net/$name/installations/$id?api-version=2015-01"),
+    headers: {"Content-Type": "application/json-patch+json", "Authorization": sasToken},
+    body: jsonEncode([{
+      "op": "add",
+      "path": "/pushChannel",
+      "value": gcmToken
     }])
   );
 }

@@ -1,16 +1,18 @@
-// ===== profile_device.dart ==============================
-// Containcs Profile and DeviceEntry models.
+// ===== profile.dart =====================================
+// The Profile model represents a user profile (name, email, phone number and password).
 
 class Profile {
   String name;
   String email;
   String phoneNumber;
   String? password;
+  String? deviceId;
   Profile({
     this.name = "",
     this.email = "",
     this.phoneNumber = "",
     this.password,
+    this.deviceId,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
@@ -18,14 +20,7 @@ class Profile {
       name: json['name'],
       email: json['email'],
       phoneNumber: json['phoneNumber'],
+      deviceId: json['device_id'],
     );
   }
-}
-
-class DeviceEntry {
-  String deviceId;
-  Profile holder;
-  bool notify;
-  bool emergenecy;
-  DeviceEntry(this.deviceId, this.holder, {this.notify = true, this.emergenecy = false});
 }

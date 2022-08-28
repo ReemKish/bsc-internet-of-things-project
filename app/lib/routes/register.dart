@@ -1,8 +1,7 @@
 // ===== register.dart ====================================
 // A registration form page, opens upon first launch of the app.
 
-import 'dart:io';
-
+import 'package:app/models/login_data.dart';
 import 'package:app/routes/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +10,7 @@ import 'package:app/widgets/alerts.dart';
 import 'package:app/widgets/password_field.dart';
 import 'package:app/services/cloud_service.dart';
 import 'package:app/services/notification_service.dart';
-import 'package:app/models/profile_device.dart';
+import 'package:app/models/profile.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 
 
@@ -20,11 +19,22 @@ class RegisterRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Register"),
+    const barTitle = Text(
+      "Sign up",
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 24,
+        /* color: Colors.orange, */
+        fontWeight: FontWeight.bold,
+      )
+    );
+
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        appBar: AppBar(title: barTitle),
+        body: const RegisterForm(),
       ),
-      body: const RegisterForm(),
     );
   }
 }
@@ -66,7 +76,7 @@ class _RegisterFormState extends State<RegisterForm> {
   void _registerSuccess() {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => HomeRoute(profile),
+        pageBuilder: (context, animation, secondaryAnimation) => HomeRoute(LoginData(profile: profile)),
         transitionDuration: const Duration(milliseconds: 600),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(0.0, 1.0);
@@ -129,7 +139,7 @@ class _RegisterFormState extends State<RegisterForm> {
     const halfSizedBoxSpace = SizedBox(height: 12);
 
     final fName = TextFormField(
-      initialValue: "Reem Kishinevsky",  // TODO - remove this
+      /* initialValue: "",  // - remove this */
       textInputAction: TextInputAction.next,
       textCapitalization: TextCapitalization.words,
       decoration: const InputDecoration(
@@ -144,7 +154,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
 
     final fPhone = TextFormField(
-      initialValue: "054 642 1200",  // TODO - remove this
+      /* initialValue: "054 642 1200",  // - remove this */
       textInputAction: TextInputAction.next,
       decoration: const InputDecoration(
         filled: true,
@@ -168,7 +178,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
 
     final fEmail = TextFormField(
-      initialValue: "reemkish@gmail.com",  // TODO - remove this
+      /* initialValue: "@arc.com",  // - remove this */
       textInputAction: TextInputAction.next,
       decoration: const InputDecoration(
         filled: true,
@@ -198,7 +208,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
 
     final fRetypePassword = TextFormField(
-      initialValue: "Stonewow1",  // TODO - remove this
+      /* initialValue: "123456",  // - remove this */
       focusNode: _retypePassword,
       decoration: const InputDecoration(
         filled: true,
@@ -227,9 +237,12 @@ class _RegisterFormState extends State<RegisterForm> {
                 fPassword,        // Password field
                 sizedBoxSpace,
                 fRetypePassword,  // Re-type password field
-                sizedBoxSpace,
+                halfSizedBoxSpace,
                 Center(
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
+                    ),
                     onPressed: () {
                       final form = _formKey.currentState!;
                       if (!form.validate()) {
@@ -244,17 +257,14 @@ class _RegisterFormState extends State<RegisterForm> {
                         _register().then((ok) {
                           progress?.dismiss(); 
                           if (ok) {
-                            /* showInSnackBar(context, "Registration successful!"); */
-                            Future.delayed(const Duration(milliseconds: 00),
-                              () => _registerSuccess()
-                            );
+                            _registerSuccess();
                           } else {
                             showInSnackBar(context, "Registration failed!");
                           }
                         });
                       }
                     },
-                    child: const Text("Submit"),
+                    child: const Text("Sign up"),
                   ),
                 ),
                 halfSizedBoxSpace,
@@ -271,5 +281,4 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 }
-
 

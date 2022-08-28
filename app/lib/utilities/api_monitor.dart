@@ -8,5 +8,6 @@ bool apiCallSuccess(String func, Response response) {
   debugPrint(response.statusCode == 200 ?
     "$func - success" :
     "$func - failed with status ${response.statusCode}");
+  debugPrint("Recieved headers: ${response.headers}");
   return response.statusCode == 200;
 }

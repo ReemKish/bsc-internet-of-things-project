@@ -55,12 +55,13 @@ alertDiaglog({
 void showInSnackBar(
   BuildContext context,
   String msg,
+  {int? seconds}
 ) {
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(msg),
-      duration: const Duration(seconds: 1),
+      duration: Duration(seconds: seconds ?? 1),
     )
   );
 }
@@ -169,7 +170,7 @@ class FieldButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return isTextFieldShown 
           ? TextFormField(
-              initialValue: "ARC-001",  // TODO remove this
+              /* initialValue: "ARC-001",  // remove this */
               textCapitalization: TextCapitalization.characters,
               autofocus: true,
               onFieldSubmitted: (String value) {action(value);},

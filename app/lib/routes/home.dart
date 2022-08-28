@@ -6,7 +6,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:app/widgets/alerts.dart';
 import 'package:app/widgets/bottom_bar.dart';
-import 'package:app/models/profile_device.dart';
+import 'package:app/models/device_entry.dart';
+import 'package:app/models/login_data.dart';
 import 'package:app/utilities/avatar.dart';
 import 'package:app/routes/scan_qr.dart';
 import 'package:app/services/cloud_service.dart';
@@ -16,8 +17,8 @@ import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 
 
 class HomeRoute extends StatefulWidget {
-  final Profile profile;
-  const HomeRoute(this.profile, {Key? key}) : super(key: key);
+  final LoginData loginData;
+  const HomeRoute(this.loginData, {Key? key}) : super(key: key);
 
   @override
   State createState() => HomeRouteState();
@@ -26,17 +27,32 @@ class HomeRoute extends StatefulWidget {
 
 class HomeRouteState extends State<HomeRoute> with WidgetsBindingObserver{
   bool _registerdHandler = false;  // register notification foreground handler only once.
-  final _followedDevices = <String, DeviceEntry>{
-    "ARC-001": DeviceEntry("ARC-001", Profile(name: "Reem Kishinevsky", email: "reem.kishinevsky@gmail.com", phoneNumber: "054-642-1200")),
-    "ARC-002": DeviceEntry('ARC-002', Profile(name: "David Molina", email: "davidm@gmail.com", phoneNumber: "054-123-4567")),
-  };
+  String deviceId = '';
+  final Map<String, DeviceEntry> _followedDevices = {};
+  /* final _followedDevices = <String, DeviceEntry>{ */
+  /*   "ARC-001": DeviceEntry("ARC-001", Profile(name: "Reem Kishinevsky", email: "reem.kishinevsky@gmail.com", phoneNumber: "054-642-1200")), */
+  /*   "ARC-002": DeviceEntry('ARC-002', Profile(name: "David Molina", email: "davidm@gmail.com", phoneNumber: "054-123-4567")), */
+  /* }; */
+
+  @override
+  void initState() {
+    widget.loginData.following?.forEach((profile) {
+      _followedDevices[profile.deviceId!] = DeviceEntry(profile.deviceId!, profile);
+      debugPrint("${profile.deviceId}");
+    });
+    deviceId = widget.loginData.deviceId ?? '';
+    super.initState();
+  }
 
 
   Widget _buildDeviceList() => ListView(
     padding: const EdgeInsets.only(top: 4.0, bottom: 32),
     children: _followedDevices.values.map((device) => DeviceItem(
       device: device,
-      delFun: () => setState(() {_followedDevices.remove(device.deviceId);}),
+      delFun: () => setState(() {
+        CloudService.unfollow(widget.loginData.profile.email, device.deviceId);
+        _followedDevices.remove(device.deviceId);
+      }),
       dismissAlarm: () => setState(() {device.emergenecy = false;}),
       emergency: device.emergenecy,
       key: Key(device.deviceId))
@@ -47,7 +63,7 @@ class HomeRouteState extends State<HomeRoute> with WidgetsBindingObserver{
     /* update device list */
     final progress = ProgressHUD.of(ctx);
     progress?.show();
-    final profile = await CloudService.follow(widget.profile.email, deviceId);
+    final profile = await CloudService.follow(widget.loginData.profile.email, deviceId);
     if (profile == null) {
       progress?.dismiss();
       alertDiaglog(
@@ -58,7 +74,7 @@ class HomeRouteState extends State<HomeRoute> with WidgetsBindingObserver{
       return;
     }
     /* subscribe to notifications */
-    await NotificationService.followDevice(widget.profile.email, deviceId);
+    await NotificationService.followDevice(widget.loginData.profile.email, deviceId);
     final device = DeviceEntry(deviceId, profile);
     setState(() {
       _followedDevices[deviceId] = device;
@@ -66,38 +82,69 @@ class HomeRouteState extends State<HomeRoute> with WidgetsBindingObserver{
     progress?.dismiss();
   }
 
-  void _scanDeviceQR(BuildContext ctx) {
+
+  void _linkDevice(BuildContext ctx, String deviceId) async {
+    /* update device list */
+    final progress = ProgressHUD.of(ctx);
+    progress?.show();
+    final linkOk = await CloudService.link(widget.loginData.profile.email, deviceId);
+    if (!linkOk) {
+      progress?.dismiss();
+      alertDiaglog(
+        context: context,
+        title: "Device already linked",
+        content: "Device [$deviceId] is linked to a different account.",
+      );
+      return;
+    }
+    /* subscribe to notifications */
+    setState(() {
+      this.deviceId = deviceId;
+      showInSnackBar(ctx, "Successfuly linked device [$deviceId].");
+    });
+    progress?.dismiss();
+  }
+
+  void _scanDeviceQR(BuildContext ctx, Function(String) action) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) =>
-          buildqr(context, (id) {
-            _followDevice(ctx, id);
-        })
+          buildqr(context, action)
       )
     );
   }
 
-  void _addDevice(BuildContext ctx) async {
+  void _deviceActionDialog(BuildContext ctx, String title, Function(String) action) async {
     Navigator.of(context).push(
       DialogRoute<String>(
         context: context,
         builder: (context) => SimpleDialog(
-          title: const Text("Add Device"),
+          title: Text(title),
           children: [
             DialogItem(
               icon: Icons.qr_code_scanner,
               text: 'Scan device QR',
-              action: () => _scanDeviceQR(ctx),
+              action: () => _scanDeviceQR(ctx, action),
             ),
             DialogFieldButton(
               icon: Icons.vpn_key,
               text: 'Enter device ID',
-              action: (deviceId) => _followDevice(ctx, deviceId),
+              action: action,
             ),
           ],
         )
       )
     );
+  }
+
+
+  void _linkDeviceDialog(BuildContext ctx) async {
+    _deviceActionDialog(ctx, "Link Device", (String deviceId) {_linkDevice(ctx, deviceId);});
+  }
+
+
+  void _followDeviceDialog(BuildContext ctx) async {
+    _deviceActionDialog(ctx, "Add Device", (String deviceId) {_followDevice(ctx, deviceId);});
   }
 
 
@@ -108,6 +155,8 @@ class HomeRouteState extends State<HomeRoute> with WidgetsBindingObserver{
       _registerdHandler = true;
       NotificationService.registerForegroundHandler((String deviceId) {
         setState(() {
+          debugPrint("Setting emergency: $deviceId");
+          debugPrint("device is ${_followedDevices[deviceId]}");
           _followedDevices[deviceId]?.emergenecy = true;
         });
         Alarm.beep();
@@ -131,12 +180,12 @@ class HomeRouteState extends State<HomeRoute> with WidgetsBindingObserver{
           appBar: AppBar(toolbarHeight: 40),
           body: _followedDevices.isEmpty ? noDevicesMsg : _buildDeviceList(),
           floatingActionButton: FloatingActionButton(
-            onPressed: () {_addDevice(context); },
+            onPressed: () {_followDeviceDialog(context); },
             tooltip: "Scan device QR",
             child: const Icon(Icons.add),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-          bottomNavigationBar: BottomBar(widget.profile),
+          bottomNavigationBar: BottomBar(widget.loginData.profile, deviceId, () => _linkDeviceDialog(context)),
         ),
       ),
     );

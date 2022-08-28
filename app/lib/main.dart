@@ -2,9 +2,7 @@
 // Sets style settings and invokes the launch of the app.
 
 import 'package:flutter/material.dart';
-import 'package:app/routes/register.dart';
-import 'package:app/routes/home.dart';
-import 'package:app/models/profile_device.dart';
+import 'package:app/routes/login.dart';
 import 'package:app/notification_handler.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -61,8 +59,7 @@ class App extends StatelessWidget {
       ),
 
       themeMode: ThemeMode.system,
-      /* home: const RegisterRoute(), */
-      home: HomeRoute(Profile(name: "Reem Kishinevsky", email: "reemkish@gmail.com", phoneNumber: "054 642 1200")),
+      home: const LoginRoute(),
     );
   }
 }
