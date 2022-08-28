@@ -62,7 +62,7 @@ class App extends StatelessWidget {
 
       themeMode: ThemeMode.system,
       /* home: const RegisterRoute(), */
-      home: HomeRoute(Profile("Reem Kishinevsky", "reemkish@gmail.com", "054 642 1200", "stonewow1")),
+      home: HomeRoute(Profile(name: "Reem Kishinevsky", email: "reemkish@gmail.com", phoneNumber: "054 642 1200")),
     );
   }
 }
