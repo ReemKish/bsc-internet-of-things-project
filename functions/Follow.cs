@@ -54,7 +54,7 @@ namespace Arc.Function
                 }
 
                 //Do not add if already following
-                if (follower.Following.Contains(owner.Id) && !delete){
+                if (follower.Following != null && follower.Following.Contains(owner.Id) && !delete){
                     return new ConflictResult();
                 }
 
