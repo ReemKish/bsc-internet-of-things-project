@@ -65,9 +65,9 @@ The workshop was guided by Sivan Toledo, Nir Levy and Moab Arar.
 August 29th, 2022.
 
 <p float="left">
-  <img src="graphics/yuval.webm" width="100" />
-  <img src="graphics/reem.webm" width="100" /> 
-  <img src="graphics/david.webm" width="100" />
+  <img src="graphics/yuval.png" width="100" />
+  <img src="graphics/reem.png" width="100" /> 
+  <img src="graphics/david.png" width="100" />
 </p>
 
 ## Git
