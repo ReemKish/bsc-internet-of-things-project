@@ -100,7 +100,6 @@ int time_unit = total_time/frequency; //one cycle duration in ms
 float vector_sum;
 float sliding_window[frequency];
 int window_index = 0;
-//float threshold = 2/9.8;
 float threshold = 4.5/9.8;
 bool fall_was_reported = 0;
 
@@ -372,7 +371,6 @@ static void getTelemetryPayload(az_span payload, az_span* out_payload)
       payload, AZ_SPAN_FROM_STR("{ \"msgCount\": "));
   (void)az_span_u32toa(payload, telemetry_send_count++, &payload);
   payload = az_span_copy(payload, AZ_SPAN_FROM_STR(", \"deviceId\": \""));
-  //payload = az_span_copy(payload, AZ_SPAN_FROM_STR("\"device5032\""));
   payload = az_span_copy(payload, AZ_SPAN_FROM_STR(IOT_CONFIG_DEVICE_ID));
   payload = az_span_copy(payload, AZ_SPAN_FROM_STR("\", \"timestamp\": "));
   (void)az_span_u32toa(payload, DateTime.now(), &payload);
@@ -418,16 +416,13 @@ static void sendTelemetry()
 }
 
 // Arduino setup and loop main functions.
-const int BUTTON_PIN = 0;
 const int LED_PIN = 5;
+const int BUTTON_PIN = 12;
 
 void setup()
 {
-  //String id = System.deviceID();
-  //uint32_t id0 = MCUCTRL->CHIPID0;
-  //uint32_t id1 = MCUCTRL->CHIPID1;
-  //Logger.Info(id0);
   setup_fall_detection();
+  
   digitalWrite(LED_PIN, LOW); // LED off
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   
