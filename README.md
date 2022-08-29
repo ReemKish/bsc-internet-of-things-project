@@ -1,5 +1,5 @@
 # uni-iot-project
-Our project for the IoT workshop at Tel Aviv University.
+Our project for the IoT workshop at Tel Aviv University. [ARC Website](https://yuvalchic.wixsite.com/arc-team)
 
 
 # ARC - Automatically Recognize a Collapse
@@ -14,7 +14,7 @@ Meet ARC. The chest strap which alerts you when your family members are in troub
 ## Architecture
 The following diagram shows how our system works end to end. Every technology was selected and developed with great care.
 
-  ![ARC Stack](graphics/stack.png)
+  <img align="center" src="graphics/stack.png" width="100" />
 
 ## Hardware
 Every ARC accessory includes a SparkFun Thing Plus ESP32 board paired with a 3-axis accelerometer and a button. We sample the sensor and calculate the weighted acceleration value in a frequency of 100Hz.
@@ -23,7 +23,7 @@ Upon detection of exceptionally low acceleration values, we conclude that a fall
 
 The user may also manually trigger by pressing the button.
 
-  ![Graph](graphics/graph.png)
+  <img align="center" src="graphics/graph.png" width="100" />
 
 ## Azure Services
 ### CosmosDB
@@ -75,5 +75,7 @@ August 29th, 2022.
 
 ## Contact
 <davidmolina@mail.tau.ac.il>
+
 <reemkishinevsky@gmail.com>
+
 <yuvalc2@mail.tau.ac.il>
