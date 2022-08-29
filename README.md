@@ -64,7 +64,7 @@ We are students in Tel Aviv Unitersity, studying for B.Sc in Computer Science.
 The workshop was guided by Sivan Toledo, Nir Levy and Moab Arar.
 August 29th, 2022.
 
-<p float="left">
+<p float="left" align="center">
   <img src="graphics/yuval.png" width="100" />
   <img src="graphics/reem.png" width="100" /> 
   <img src="graphics/david.png" width="100" />
