@@ -14,7 +14,9 @@ Meet ARC. The chest strap which alerts you when your family members are in troub
 ## Architecture
 The following diagram shows how our system works end to end. Every technology was selected and developed with great care.
 
-  <img align="center" src="graphics/stack.png" width="100" />
+<p align="center">
+  <img src="graphics/stack.png" width="100" />
+</p>
 
 ## Hardware
 Every ARC accessory includes a SparkFun Thing Plus ESP32 board paired with a 3-axis accelerometer and a button. We sample the sensor and calculate the weighted acceleration value in a frequency of 100Hz.
@@ -23,7 +25,9 @@ Upon detection of exceptionally low acceleration values, we conclude that a fall
 
 The user may also manually trigger by pressing the button.
 
-  <img align="center" src="graphics/graph.png" width="100" />
+<p align="center">
+  <img src="graphics/graph.png" width="100" />
+</p>
 
 ## Azure Services
 ### CosmosDB
