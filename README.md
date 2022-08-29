@@ -15,7 +15,7 @@ Meet ARC. The chest strap which alerts you when your family members are in troub
 The following diagram shows how our system works end to end. Every technology was selected and developed with great care.
 
 <p align="center">
-  <img src="graphics/stack.png" width="200" />
+  <img src="graphics/stack.png"/>
 </p>
 
 ## Hardware
@@ -26,7 +26,7 @@ Upon detection of exceptionally low acceleration values, we conclude that a fall
 The user may also manually trigger by pressing the button.
 
 <p align="center">
-  <img src="graphics/graph.png" width="300" />
+  <img src="graphics/graph.png"/>
 </p>
 
 ## Azure Services
