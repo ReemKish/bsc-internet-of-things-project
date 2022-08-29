@@ -1,6 +1,6 @@
 # uni-iot-project
 Our project for the IoT workshop at Tel Aviv University. [ARC Website](https://yuvalchic.wixsite.com/arc-team)
-[Trailer With Tutorial](https://youtu.be/wNCgVJkX4CE)
+[Trailer + Demo + Tutorial](https://youtu.be/wNCgVJkX4CE)
 [Trailer Only](https://youtu.be/2pmf_FQPWzk)
 
 # ARC - Automatically Recognize a Collapse
